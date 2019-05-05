@@ -34,7 +34,7 @@
 			this.SavePresetButton = new System.Windows.Forms.Button();
 			this.PresetList = new System.Windows.Forms.ComboBox();
 			this.LogTextBox = new MK2360.ReadOnlyTextBox();
-			this.label2 = new System.Windows.Forms.Label();
+			this.ProcessLabel = new System.Windows.Forms.Label();
 			this.ProcessComboBox = new System.Windows.Forms.ComboBox();
 			this.DeleteButton = new System.Windows.Forms.Button();
 			this.CreditsButton = new System.Windows.Forms.Button();
@@ -128,15 +128,15 @@
 			this.LogTextBox.Size = new System.Drawing.Size(856, 128);
 			this.LogTextBox.TabIndex = 21;
 			// 
-			// label2
+			// ProcessLabel
 			// 
-			this.label2.AutoSize = true;
-			this.label2.Font = new System.Drawing.Font("Nirmala UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label2.Location = new System.Drawing.Point(7, 68);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(48, 13);
-			this.label2.TabIndex = 22;
-			this.label2.Text = "Process:";
+			this.ProcessLabel.AutoSize = true;
+			this.ProcessLabel.Font = new System.Drawing.Font("Nirmala UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.ProcessLabel.Location = new System.Drawing.Point(7, 68);
+			this.ProcessLabel.Name = "ProcessLabel";
+			this.ProcessLabel.Size = new System.Drawing.Size(48, 13);
+			this.ProcessLabel.TabIndex = 22;
+			this.ProcessLabel.Text = "Process:";
 			// 
 			// ProcessComboBox
 			// 
@@ -387,7 +387,7 @@
 			this.Controls.Add(this.CreditsButton);
 			this.Controls.Add(this.DeleteButton);
 			this.Controls.Add(this.ProcessComboBox);
-			this.Controls.Add(this.label2);
+			this.Controls.Add(this.ProcessLabel);
 			this.Controls.Add(this.LogTextBox);
 			this.Controls.Add(this.PresetList);
 			this.Controls.Add(this.SavePresetButton);
@@ -449,16 +449,16 @@
         private System.Windows.Forms.Button NewPresetButton;
         private System.Windows.Forms.Button SavePresetButton;
 		private ReadOnlyTextBox LogTextBox;
-		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.Label ProcessLabel;
 		public System.Windows.Forms.ComboBox PresetList;
 		public System.Windows.Forms.ComboBox ProcessComboBox;
 		private System.Windows.Forms.Button DeleteButton;
 		private System.Windows.Forms.Button CreditsButton;
-		private System.Windows.Forms.Button ControllerModeButton;
 		private System.Windows.Forms.Label KillSwitchKey;
 		public System.Windows.Forms.TextBox KillSwitchTextBox;
 		private System.Windows.Forms.Label PresetNameLabel;
 		public System.Windows.Forms.TextBox PresetNameTextbox;
+		public System.Windows.Forms.Button ControllerModeButton;
 	}
 }
 

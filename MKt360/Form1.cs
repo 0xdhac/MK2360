@@ -8,7 +8,6 @@ using System.Diagnostics;
 using Nett;
 using System.Runtime.InteropServices;
 using NLog;
-using ScpDriverInterface;
 
 namespace MK2360
 {
@@ -69,12 +68,12 @@ namespace MK2360
 					Preset.Current = p;
 				}
 			}
-			/*
+			
 			Thread t = new Thread(Intercept);
 			t.IsBackground = true;
 			t.Start();
 
-			
+			/*
 			Thread d = new Thread(Destroy);
 			d.IsBackground = true;
 			d.Start();
@@ -91,30 +90,100 @@ namespace MK2360
 			ProcessComboBox.DropDown					+= ProcessComboBox_DropDown;
 			ProcessComboBox.DropDownWidth				= 350;
 			LogTextBox.ScrollBars						= ScrollBars.Vertical;
-			LogTextBox.GotFocus							+= LogBoxFocused;
 
 			// Bindings
-			KillSwitchTextBox.Click		+= new EventHandler(KillSwitchTextBox_Clicked);
-			AButton.Click				+= new EventHandler(AButton_Click);
-			YButton.Click				+= new EventHandler(YButton_Click);
-			XButton.Click				+= new EventHandler(XButton_Click);
-			BButton.Click				+= new EventHandler(BButton_Click);
-			StartButton.Click			+= new EventHandler(StartButton_Click);
-			BackButton.Click			+= new EventHandler(BackButton_Click);
-			RightJoystickButton.Click	+= new EventHandler(RightJoy_Click);
-			LeftJoystickButton.Click	+= new EventHandler(LeftJoy_Click);
-			DpadButton.Click			+= new EventHandler(DPad_Click);
-			LTButton.Click				+= new EventHandler(LTrigger_Click);
-			LBButton.Click				+= new EventHandler(LBButton_Click);
-			RTButton.Click				+= new EventHandler(RTrigger_Click);
-			RBButton.Click				+= new EventHandler(RBButton_Click);
+			ControllerModeButton.Click	+= ControllerModeButton_Click;
+			KillSwitchTextBox.Click		+= KillSwitchTextBox_Clicked;
+			AButton.Click				+= AButton_Click;
+			YButton.Click				+= YButton_Click;
+			XButton.Click				+= XButton_Click;
+			BButton.Click				+= BButton_Click;
+			StartButton.Click			+= StartButton_Click;
+			BackButton.Click			+= BackButton_Click;
+			RightJoystickButton.Click	+= RightJoy_Click;
+			LeftJoystickButton.Click	+= LeftJoy_Click;
+			DpadButton.Click			+= DPad_Click;
+			LTButton.Click				+= LTrigger_Click;
+			LBButton.Click				+= LBButton_Click;
+			RTButton.Click				+= RTrigger_Click;
+			RBButton.Click				+= RBButton_Click;
+			
 
 			ControllerModeButton.FlatStyle = FlatStyle.Flat;
 		}
 
-		private void LogBoxFocused(object sender, EventArgs e)
+		private void ControllerModeButton_Click(object sender, EventArgs e)
 		{
-			
+			if(XMode.IsActive())
+			{
+				XMode.Stop(true);
+			}
+			else
+			{
+				XMode.Start();
+			}
+		}
+
+		public void HidePresetControls()
+		{
+			if (InvokeRequired)
+			{
+				Invoke(new Action(() =>
+				{
+					PresetLabel.Hide();
+					PresetList.Hide();
+					PresetNameLabel.Hide();
+					PresetNameTextbox.Hide();
+					ProcessLabel.Hide();
+					ProcessComboBox.Hide();
+					NewPresetButton.Hide();
+					SavePresetButton.Hide();
+					DeleteButton.Hide();
+				}));
+			}
+			else
+			{
+				PresetLabel.Hide();
+				PresetList.Hide();
+				PresetNameLabel.Hide();
+				PresetNameTextbox.Hide();
+				ProcessLabel.Hide();
+				ProcessComboBox.Hide();
+				NewPresetButton.Hide();
+				SavePresetButton.Hide();
+				DeleteButton.Hide();
+			}
+		}
+
+		public void ShowPresetControls()
+		{
+			if (InvokeRequired)
+			{
+				Invoke(new Action(() =>
+				{
+					PresetLabel.Show();
+					PresetList.Show();
+					PresetNameLabel.Show();
+					PresetNameTextbox.Show();
+					ProcessLabel.Show();
+					ProcessComboBox.Show();
+					NewPresetButton.Show();
+					SavePresetButton.Show();
+					DeleteButton.Show();
+				}));
+			}
+			else
+			{
+				PresetLabel.Show();
+				PresetList.Show();
+				PresetNameLabel.Show();
+				PresetNameTextbox.Show();
+				ProcessLabel.Show();
+				ProcessComboBox.Show();
+				NewPresetButton.Show();
+				SavePresetButton.Show();
+				DeleteButton.Show();
+			}
 		}
 
 		private void LeftJoy_Click(object sender, EventArgs e)

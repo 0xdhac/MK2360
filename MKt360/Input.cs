@@ -74,13 +74,7 @@ namespace MK2360
 		}
 		public static void RemoveKeyListener(KeyStateChangeCallback func)
 		{
-			foreach(KeyStateChangeCallback k in Listeners)
-			{
-				if(k == func)
-				{
-					Listeners.Remove(k);
-				}
-			}
+			Listeners.Remove(func);
 		}
 		public InputAction CallKeyListeners()
 		{
@@ -277,6 +271,16 @@ namespace MK2360
 		public override string ToString()
 		{
 			return Code.ToString();
+		}
+
+		public static bool operator ==(Key a, Input b)
+		{
+			return (a.m_InputType == b.m_InputType && a.Code == b.Code);
+		}
+
+		public static bool operator !=(Key a, Input b)
+		{
+			return !(a.m_InputType == b.m_InputType && a.Code == b.Code);
 		}
 	}
 
