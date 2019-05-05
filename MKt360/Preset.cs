@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Forms;
 using System.IO;
 using Nett;
 
@@ -8,11 +9,17 @@ namespace MK2360
 	{
 		public string m_Name { get; set; }
 		public ProcessItem m_ProcessItem { get; set; }
+		public BindList m_BindList { get; set; } = new BindList();
 
 		public static string m_Path        = @"presets";
 		public static string m_FileType    = @"cfg";
 		public static string m_DefaultName = @"preset";
 		private static Preset m_Current;
+
+		public Preset()
+		{
+			m_BindList = new BindList();
+		}
 
 		public static Preset Current
 		{
@@ -33,10 +40,17 @@ namespace MK2360
 
 				// Update UI information based on the current preset
 				Form1.MainForm.ProcessComboBox.Enabled = true;
-				Form1.MainForm.PresetNameTextbox.Enabled = true;
-				Form1.MainForm.UpdateProcessList();
+				//Form1.MainForm.PresetNameTextbox.Enabled = true;
+				//Form1.MainForm.UpdateProcessList();
 				Form1.MainForm.PresetList.SelectedItem = m_Current;
 				Form1.MainForm.PresetList.Text = m_Current.m_Name;
+				Form1.MainForm.PresetNameTextbox.Text = m_Current.m_Name;
+				Form1.MainForm.UpdateProcessList();
+
+				if(KeyPanelClass.CurrentPanel != null)
+				{
+					((Panel)(KeyPanelClass.CurrentPanel)).Dispose();
+				}
 			}
 		}
 

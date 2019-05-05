@@ -17,18 +17,8 @@ namespace MK2360
 		public static Form1 MainForm;
 		public Form1()
 		{
-			InitializeComponent();
 			MainForm = this;
-			FormBorderStyle = FormBorderStyle.FixedSingle;
-			MaximizeBox = false;
-
-			PresetNameTextbox.KeyDown += (sender, args) =>
-			{
-				if (args.KeyCode == Keys.Return)
-				{
-					SavePresetButton.PerformClick();
-				}
-			};
+			InitializeComponent();
 
 			// Check if program never ran or if the config doesn't exist somehow
 			if (!Config.Exists())
@@ -79,35 +69,213 @@ namespace MK2360
 					Preset.Current = p;
 				}
 			}
-
+			/*
 			Thread t = new Thread(Intercept);
 			t.IsBackground = true;
 			t.Start();
-			/*
+
+			
 			Thread d = new Thread(Destroy);
 			d.IsBackground = true;
 			d.Start();
 			*/
 
-			using (Process p = Process.GetCurrentProcess())
-				p.PriorityClass = ProcessPriorityClass.High;
-
-			PresetList.SelectedIndexChanged      += PresetList_SelectedIndexChanged;
-			ProcessComboBox.SelectedIndexChanged += ProcessList_SelectedIndexChanged;
-			ProcessComboBox.DropDown             += ProcessComboBox_DropDown;
-			ProcessComboBox.DropDownWidth         = 350;
-			KillSwitchTextBox.Click += new EventHandler(KillSwitchTextBox_Clicked);
-
+			// Update UI
 			UpdatePresetList();
-			PresetList.SelectedItem = Preset.Current;
-			PresetList.Text = Preset.Current.m_Name;
+			FormBorderStyle								= FormBorderStyle.FixedSingle;
+			MaximizeBox									= false;
+			PresetList.SelectedItem						= Preset.Current;
+			PresetList.Text								= Preset.Current.m_Name;
+			PresetList.SelectedIndexChanged				+= PresetList_SelectedIndexChanged;
+			ProcessComboBox.SelectedIndexChanged		+= ProcessList_SelectedIndexChanged;
+			ProcessComboBox.DropDown					+= ProcessComboBox_DropDown;
+			ProcessComboBox.DropDownWidth				= 350;
+			LogTextBox.ScrollBars						= ScrollBars.Vertical;
+			LogTextBox.GotFocus							+= LogBoxFocused;
+
+			// Bindings
+			KillSwitchTextBox.Click		+= new EventHandler(KillSwitchTextBox_Clicked);
+			AButton.Click				+= new EventHandler(AButton_Click);
+			YButton.Click				+= new EventHandler(YButton_Click);
+			XButton.Click				+= new EventHandler(XButton_Click);
+			BButton.Click				+= new EventHandler(BButton_Click);
+			StartButton.Click			+= new EventHandler(StartButton_Click);
+			BackButton.Click			+= new EventHandler(BackButton_Click);
+			RightJoystickButton.Click	+= new EventHandler(RightJoy_Click);
+			LeftJoystickButton.Click	+= new EventHandler(LeftJoy_Click);
+			DpadButton.Click			+= new EventHandler(DPad_Click);
+			LTButton.Click				+= new EventHandler(LTrigger_Click);
+			LBButton.Click				+= new EventHandler(LBButton_Click);
+			RTButton.Click				+= new EventHandler(RTrigger_Click);
+			RBButton.Click				+= new EventHandler(RBButton_Click);
+
+			ControllerModeButton.FlatStyle = FlatStyle.Flat;
 		}
 
+		private void LogBoxFocused(object sender, EventArgs e)
+		{
+			
+		}
+
+		private void LeftJoy_Click(object sender, EventArgs e)
+		{
+			JoyControl b = new JoyControl();
+			Controls.Add(b);
+			b.Location = new Point(10, 176);
+			b.Size = new Size(178, 174);
+			b.IsLeft = true;
+			b.m_InputType_Box.SelectedIndex = (int)Preset.Current.m_BindList.LeftJoyType;
+			b.m_JoyPress_Ctrl.Key = Preset.Current.m_BindList.LeftJoyPress;
+			b.m_BindUp.Key = Preset.Current.m_BindList.LeftJoyUp;
+			b.m_BindDown.Key = Preset.Current.m_BindList.LeftJoyDown;
+			b.m_BindRight.Key = Preset.Current.m_BindList.LeftJoyRight;
+			b.m_BindLeft.Key = Preset.Current.m_BindList.LeftJoyLeft;
+
+			KeyPanelClass.CurrentPanel = b;
+		}
+		private void RightJoy_Click(object sender, EventArgs e)
+		{
+			JoyControl b = new JoyControl();
+			Controls.Add(b);
+			b.Location = new Point(10, 176);
+			b.Size = new Size(178, 174);
+			b.IsLeft = false;
+			b.m_InputType_Box.SelectedIndex = (int)Preset.Current.m_BindList.RightJoyType;
+			b.m_JoyPress_Ctrl.Key = Preset.Current.m_BindList.RightJoyPress;
+			b.m_BindUp.Key = Preset.Current.m_BindList.RightJoyUp;
+			b.m_BindDown.Key = Preset.Current.m_BindList.RightJoyDown;
+			b.m_BindRight.Key = Preset.Current.m_BindList.RightJoyRight;
+			b.m_BindLeft.Key = Preset.Current.m_BindList.RightJoyLeft;
+
+			KeyPanelClass.CurrentPanel = b;
+		}
+		private void DPad_Click(object sender, EventArgs e)
+		{
+			DPadControl b = new DPadControl();
+			Controls.Add(b);
+			b.Location = new Point(10, 176);
+			b.Size = new Size(178, 174);
+			b.m_BindUp.Key = Preset.Current.m_BindList.DPadUp;
+			b.m_BindDown.Key = Preset.Current.m_BindList.DPadDown;
+			b.m_BindRight.Key = Preset.Current.m_BindList.DPadRight;
+			b.m_BindLeft.Key = Preset.Current.m_BindList.DPadLeft;
+
+			KeyPanelClass.CurrentPanel = b;
+		}
+		private void RBButton_Click(object sender, EventArgs e)
+		{
+			ButtonControl b = new ButtonControl();
+			Controls.Add(b);
+			b.Location = new Point(10, 176);
+			b.Size = new Size(178, 174);
+			b.m_Label.Text = "Right bumper key: ";
+			b.m_Bind.Key = Preset.Current.m_BindList.RightBumper;
+
+			KeyPanelClass.CurrentPanel = b;
+		}
+		private void RTrigger_Click(object sender, EventArgs e)
+		{
+			ButtonControl b = new ButtonControl();
+			Controls.Add(b);
+			b.Location = new Point(10, 176);
+			b.Size = new Size(178, 174);
+			b.m_Label.Text = "Right trigger key: ";
+			b.m_Bind.Key = Preset.Current.m_BindList.RightTrigger;
+
+			KeyPanelClass.CurrentPanel = b;
+		}
+		private void LBButton_Click(object sender, EventArgs e)
+		{
+			ButtonControl b = new ButtonControl();
+			Controls.Add(b);
+			b.Location = new Point(10, 176);
+			b.Size = new Size(178, 174);
+			b.m_Label.Text = "Left bumper key: ";
+			b.m_Bind.Key = Preset.Current.m_BindList.LeftBumper;
+
+			KeyPanelClass.CurrentPanel = b;
+		}
+		private void LTrigger_Click(object sender, EventArgs e)
+		{
+			ButtonControl b = new ButtonControl();
+			Controls.Add(b);
+			b.Location = new Point(10, 176);
+			b.Size = new Size(178, 174);
+			b.m_Label.Text = "Left trigger key: ";
+			b.m_Bind.Key = Preset.Current.m_BindList.LeftTrigger;
+
+			KeyPanelClass.CurrentPanel = b;
+		}
+		private void BackButton_Click(object sender, EventArgs e)
+		{
+			ButtonControl b = new ButtonControl();
+			Controls.Add(b);
+			b.Location = new Point(10, 176);
+			b.Size = new Size(178, 174);
+			b.m_Label.Text = "Back key: ";
+			b.m_Bind.Key = Preset.Current.m_BindList.BackButton;
+
+			KeyPanelClass.CurrentPanel = b;
+		}
+		private void StartButton_Click(object sender, EventArgs e)
+		{
+			ButtonControl b = new ButtonControl();
+			Controls.Add(b);
+			b.Location = new Point(10, 176);
+			b.Size = new Size(178, 174);
+			b.m_Label.Text = "Start key: ";
+			b.m_Bind.Key = Preset.Current.m_BindList.StartButton;
+
+			KeyPanelClass.CurrentPanel = b;
+		}
+		private void BButton_Click(object sender, EventArgs e)
+		{
+			ButtonControl b = new ButtonControl();
+			Controls.Add(b);
+			b.Location = new Point(10, 176);
+			b.Size = new Size(178, 174);
+			b.m_Label.Text = "B key: ";
+			b.m_Bind.Key = Preset.Current.m_BindList.BButton;
+
+			KeyPanelClass.CurrentPanel = b;
+		}
+		private void XButton_Click(object sender, EventArgs e)
+		{
+			ButtonControl b = new ButtonControl();
+			Controls.Add(b);
+			b.Location = new Point(10, 176);
+			b.Size = new Size(178, 174);
+			b.m_Label.Text = "X key: ";
+			b.m_Bind.Key = Preset.Current.m_BindList.XButton;
+
+			KeyPanelClass.CurrentPanel = b;
+		}
+		private void YButton_Click(object sender, EventArgs e)
+		{
+			ButtonControl b = new ButtonControl();
+			Controls.Add(b);
+			b.Location = new Point(10, 176);
+			b.Size = new Size(178, 174);
+			b.m_Label.Text = "Y key: ";
+			b.m_Bind.Key = Preset.Current.m_BindList.YButton;
+
+			KeyPanelClass.CurrentPanel = b;
+		}
+		private void AButton_Click(object sender, EventArgs e)
+		{
+			ButtonControl b = new ButtonControl();
+			Controls.Add(b);
+			b.Location = new Point(10, 176);
+			b.Size = new Size(178, 174);
+			b.m_Label.Text = "A key: ";
+			b.m_Bind.Key = Preset.Current.m_BindList.AButton;
+
+			KeyPanelClass.CurrentPanel = b;
+		}
 		private void ProcessComboBox_DropDown(object sender, EventArgs e)
 		{
 			UpdateProcessList();
 		}
-
 		private void ProcessList_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			if(Preset.Current != null)
@@ -119,15 +287,16 @@ namespace MK2360
 				Log("No preset selected");
 			}
 		}
-
 		private void Destroy()
 		{
 			Thread.Sleep(10000);
 			Application.Exit();
 		}
-
 		private void Intercept()
 		{
+			using (Process p = Process.GetCurrentProcess())
+				p.PriorityClass = ProcessPriorityClass.High;
+
 			IntPtr context = Interception.interception_create_context();
 			Interception.Stroke stroke = new Interception.Stroke();
 			int device;
@@ -145,7 +314,7 @@ namespace MK2360
 			Interception.interception_set_filter(
 				context,
 				interception_is_mouse,
-				(ushort)Interception.FilterMouseState.LeftDown);
+				(ushort)Interception.FilterMouseState.All);
 
 			while (Interception.interception_receive(context, device = Interception.interception_wait(context), ref stroke, 1) > 0)
 			{
@@ -170,6 +339,12 @@ namespace MK2360
 				else if (Interception.interception_is_mouse(device) != 0)
 				{
 					Interception.MouseStroke kstroke = stroke;
+
+					if(kstroke.state == (ushort)Interception.MouseState.MouseWheel)
+					{
+						Log(kstroke.rolling.ToString());
+					}
+
 					Input i = new Input(kstroke);
 
 					Input.InputAction act = i.CallKeyListeners();
@@ -188,13 +363,14 @@ namespace MK2360
 
 			Interception.interception_destroy_context(context);
 		}
-
 		private void PresetList_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			Preset.Current = (Preset)PresetList.SelectedItem;
-			PresetNameTextbox.Text = Preset.Current.m_Name;
 		}
-
+		private void PresetList_TextChanged(object sender, EventArgs e)
+		{
+			Preset.Current.m_Name = ((ComboBox)(sender)).Text;
+		}
 		private void NewPresetButton_Click(object sender, EventArgs e)
         {
             Preset p = new Preset();
@@ -206,7 +382,6 @@ namespace MK2360
 			PresetList.SelectedItem = p;
 			PresetList.Text = p.m_Name;
         }
-
         public void UpdatePresetList()
         {
             PresetList.Items.Clear();
@@ -217,7 +392,6 @@ namespace MK2360
 				PresetList.Items.Add(Toml.ReadFile<Preset>(s));
             }
         }
-
 		public void UpdateProcessList()
 		{
 			ProcessComboBox.Items.Clear();
@@ -249,20 +423,27 @@ namespace MK2360
 				}
 			}
 		}
-
         private void SavePresetButton_Click(object sender, EventArgs e)
         {
 			int index = PresetList.SelectedIndex;
 			if (PresetNameTextbox.Text.Length > 0 &&
 				PresetNameTextbox.Text != Preset.Current.m_Name)
             {
-				if(PresetNameTextbox.Text.IndexOfAny(Path.GetInvalidPathChars()) == -1 &&
+				if (PresetNameTextbox.Text.IndexOfAny(Path.GetInvalidPathChars()) == -1 &&
 				PresetNameTextbox.Text.IndexOfAny(Path.GetInvalidFileNameChars()) == -1)
 				{
-					if (Preset.Rename((Preset)(PresetList.SelectedItem), PresetNameTextbox.Text))
+					if(!Preset.Exists(PresetNameTextbox.Text))
 					{
-						PresetList.Text = PresetNameTextbox.Text;
+						if (Preset.Rename(Preset.Current, PresetNameTextbox.Text))
+						{
+							PresetList.Text = PresetNameTextbox.Text;
+						}
 					}
+					else
+					{
+						Log("Preset '" + PresetNameTextbox.Text + "' already exists.");
+					}
+
 				}
 				else
 				{
@@ -275,22 +456,20 @@ namespace MK2360
 			UpdatePresetList();
 			PresetList.SelectedIndex = index;	
 		}
-
 		public static void Log(string s)
 		{
 			if (MainForm.InvokeRequired)
 			{
-				MainForm.Invoke(new Action(() => MainForm.LogTextBox.Text += "- " + s + "\r\n"));
+				MainForm.Invoke(new Action(() => MainForm.LogTextBox.AppendText("- " + s + "\r\n")));
 			}
 			else
 			{
-				MainForm.LogTextBox.Text += s + "\r\n";
+				MainForm.LogTextBox.AppendText(s + "\r\n");
 			}
 
 			var logger = LogManager.GetCurrentClassLogger();
 			logger.Info(s);
 		}
-
 		private void DeleteButton_Click(object sender, EventArgs e)
 		{
 			if(Preset.GetCount() == 1)
@@ -306,22 +485,19 @@ namespace MK2360
 				Log("No preset selected.");
 			}
 		}
-
 		private void CreditsButton_Click(object sender, EventArgs e)
 		{
 			new Credits().ShowDialog();
 		}
-
 		private void KillSwitchTextBox_Clicked(object sender, EventArgs e)
 		{
 			((TextBox)(sender)).Text = "Press any key..";
 
 			Input.AddKeyListener(OnKillSwitchKeyChanged);
 		}
-
 		private Input.InputAction OnKillSwitchKeyChanged(Input key)
 		{
-			if(key.IsKeyboard)
+			if(key.m_InputType == Input.InputType.Keyboard)
 			{
 				Interception.KeyStroke ks = key.Stroke;
 
@@ -335,44 +511,6 @@ namespace MK2360
 				return Input.InputAction.Continue;
 			}
 		}
-	}
-
-	public class BindList
-	{
-		public enum BindType
-		{
-			Mouse,
-			Keys
-		}
-
-		public Key StartButton { get; set; }
-		public Key BackButton { get; set; }
-		public Key YButton { get; set; }
-		public Key XButton { get; set; }
-		public Key AButton { get; set; }
-		public Key BButton { get; set; }
-		public Key RightJoyPress { get; set; }
-		public BindType RightJoyType { get; set; }
-		public Key RightJoyMove { get; set; }
-		public Key RightJoyUp { get; set; }
-		public Key RightJoyDown { get; set; }
-		public Key RightJoyRight { get; set; }
-		public Key RightJoyLeft { get; set; }
-		public Key LeftJoyPress { get; set; }
-		public BindType LeftJoyType { get; set; }
-		public Key LeftJoyMove { get; set; }
-		public Key LeftJoyUp { get; set; }
-		public Key LeftJoyDown { get; set; }
-		public Key LeftJoyRight { get; set; }
-		public Key LeftJoyLeft { get; set; }
-		public Key DPadUp { get; set; }
-		public Key DPadDown { get; set; }
-		public Key DPadRight { get; set; }
-		public Key DPadLeft { get; set; }
-		public Key LeftTrigger { get; set; }
-		public Key LeftBumper { get; set; }
-		public Key RightTrigger { get; set; }
-		public Key RightBumper { get; set; }
 	}
 
 	public class Config
@@ -440,6 +578,25 @@ namespace MK2360
 				gp.AddEllipse(new Rectangle(0, 0, Width - 1, Height - 1));
 				Region = new Region(gp);
 			}
+		}
+	}
+
+	public class ReadOnlyTextBox : TextBox
+	{
+		[DllImport("user32.dll")]
+		static extern bool HideCaret(IntPtr hWnd);
+
+		public ReadOnlyTextBox()
+		{
+			ReadOnly = true;
+			BackColor = Color.White;
+			GotFocus += TextBoxGotFocus;
+			Cursor = Cursors.Arrow; // mouse cursor like in other controls
+		}
+
+		private void TextBoxGotFocus(object sender, EventArgs args)
+		{
+			HideCaret(Handle);
 		}
 	}
 }

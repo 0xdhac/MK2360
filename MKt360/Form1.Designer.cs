@@ -32,46 +32,45 @@
 			this.PresetLabel = new System.Windows.Forms.Label();
 			this.NewPresetButton = new System.Windows.Forms.Button();
 			this.SavePresetButton = new System.Windows.Forms.Button();
-			this.label1 = new System.Windows.Forms.Label();
-			this.PresetNameTextbox = new System.Windows.Forms.TextBox();
 			this.PresetList = new System.Windows.Forms.ComboBox();
-			this.LogTextBox = new System.Windows.Forms.TextBox();
+			this.LogTextBox = new MK2360.ReadOnlyTextBox();
 			this.label2 = new System.Windows.Forms.Label();
 			this.ProcessComboBox = new System.Windows.Forms.ComboBox();
 			this.DeleteButton = new System.Windows.Forms.Button();
 			this.CreditsButton = new System.Windows.Forms.Button();
-			this.button1 = new System.Windows.Forms.Button();
+			this.ControllerModeButton = new System.Windows.Forms.Button();
 			this.KillSwitchKey = new System.Windows.Forms.Label();
 			this.KillSwitchTextBox = new System.Windows.Forms.TextBox();
-			this.KeyPanel = new System.Windows.Forms.Panel();
 			this.RTButton = new System.Windows.Forms.PictureBox();
 			this.RBButton = new System.Windows.Forms.PictureBox();
 			this.LTButton = new System.Windows.Forms.PictureBox();
 			this.LBButton = new System.Windows.Forms.PictureBox();
+			this.StartButton = new System.Windows.Forms.PictureBox();
+			this.BackButton = new System.Windows.Forms.PictureBox();
+			this.pictureBox1 = new System.Windows.Forms.PictureBox();
+			this.PresetNameLabel = new System.Windows.Forms.Label();
+			this.PresetNameTextbox = new System.Windows.Forms.TextBox();
 			this.LeftJoystickButton = new MK2360.OvalPictureBox();
 			this.RightJoystickButton = new MK2360.OvalPictureBox();
 			this.XButton = new MK2360.OvalPictureBox();
 			this.BButton = new MK2360.OvalPictureBox();
 			this.YButton = new MK2360.OvalPictureBox();
 			this.AButton = new MK2360.OvalPictureBox();
-			this.StartButton = new System.Windows.Forms.PictureBox();
 			this.DpadButton = new MK2360.OvalPictureBox();
-			this.BackButton = new System.Windows.Forms.PictureBox();
-			this.pictureBox1 = new System.Windows.Forms.PictureBox();
 			((System.ComponentModel.ISupportInitialize)(this.RTButton)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.RBButton)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.LTButton)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.LBButton)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.StartButton)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.BackButton)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.LeftJoystickButton)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.RightJoystickButton)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.XButton)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.BButton)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.YButton)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.AButton)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.StartButton)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.DpadButton)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.BackButton)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// PresetLabel
@@ -106,24 +105,6 @@
 			this.SavePresetButton.UseVisualStyleBackColor = true;
 			this.SavePresetButton.Click += new System.EventHandler(this.SavePresetButton_Click);
 			// 
-			// label1
-			// 
-			this.label1.AutoSize = true;
-			this.label1.Font = new System.Drawing.Font("Nirmala UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label1.Location = new System.Drawing.Point(7, 42);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(39, 13);
-			this.label1.TabIndex = 18;
-			this.label1.Text = "Name:";
-			// 
-			// PresetNameTextbox
-			// 
-			this.PresetNameTextbox.Enabled = false;
-			this.PresetNameTextbox.Location = new System.Drawing.Point(91, 39);
-			this.PresetNameTextbox.Name = "PresetNameTextbox";
-			this.PresetNameTextbox.Size = new System.Drawing.Size(98, 20);
-			this.PresetNameTextbox.TabIndex = 19;
-			// 
 			// PresetList
 			// 
 			this.PresetList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -135,9 +116,10 @@
 			// 
 			// LogTextBox
 			// 
-			this.LogTextBox.BackColor = System.Drawing.SystemColors.InfoText;
+			this.LogTextBox.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+			this.LogTextBox.Cursor = System.Windows.Forms.Cursors.Arrow;
 			this.LogTextBox.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.LogTextBox.ForeColor = System.Drawing.Color.LawnGreen;
+			this.LogTextBox.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
 			this.LogTextBox.Location = new System.Drawing.Point(12, 386);
 			this.LogTextBox.MaxLength = 1000000;
 			this.LogTextBox.Multiline = true;
@@ -188,15 +170,16 @@
 			this.CreditsButton.UseVisualStyleBackColor = true;
 			this.CreditsButton.Click += new System.EventHandler(this.CreditsButton_Click);
 			// 
-			// button1
+			// ControllerModeButton
 			// 
-			this.button1.Font = new System.Drawing.Font("Nirmala UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.button1.Location = new System.Drawing.Point(10, 356);
-			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(178, 23);
-			this.button1.TabIndex = 26;
-			this.button1.Text = "Start";
-			this.button1.UseVisualStyleBackColor = true;
+			this.ControllerModeButton.BackColor = System.Drawing.Color.SkyBlue;
+			this.ControllerModeButton.Font = new System.Drawing.Font("Nirmala UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.ControllerModeButton.Location = new System.Drawing.Point(10, 356);
+			this.ControllerModeButton.Name = "ControllerModeButton";
+			this.ControllerModeButton.Size = new System.Drawing.Size(178, 23);
+			this.ControllerModeButton.TabIndex = 26;
+			this.ControllerModeButton.Text = "Start";
+			this.ControllerModeButton.UseVisualStyleBackColor = false;
 			// 
 			// KillSwitchKey
 			// 
@@ -216,13 +199,6 @@
 			this.KillSwitchTextBox.ReadOnly = true;
 			this.KillSwitchTextBox.Size = new System.Drawing.Size(97, 20);
 			this.KillSwitchTextBox.TabIndex = 28;
-			// 
-			// KeyPanel
-			// 
-			this.KeyPanel.Location = new System.Drawing.Point(10, 176);
-			this.KeyPanel.Name = "KeyPanel";
-			this.KeyPanel.Size = new System.Drawing.Size(178, 174);
-			this.KeyPanel.TabIndex = 29;
 			// 
 			// RTButton
 			// 
@@ -263,6 +239,55 @@
 			this.LBButton.Size = new System.Drawing.Size(58, 45);
 			this.LBButton.TabIndex = 10;
 			this.LBButton.TabStop = false;
+			// 
+			// StartButton
+			// 
+			this.StartButton.Cursor = System.Windows.Forms.Cursors.Hand;
+			this.StartButton.Image = global::MK2360.Properties.Resources.x360_button_start;
+			this.StartButton.Location = new System.Drawing.Point(574, 104);
+			this.StartButton.Name = "StartButton";
+			this.StartButton.Size = new System.Drawing.Size(35, 21);
+			this.StartButton.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+			this.StartButton.TabIndex = 3;
+			this.StartButton.TabStop = false;
+			// 
+			// BackButton
+			// 
+			this.BackButton.Cursor = System.Windows.Forms.Cursors.Hand;
+			this.BackButton.Image = global::MK2360.Properties.Resources.x360_button_back;
+			this.BackButton.Location = new System.Drawing.Point(459, 104);
+			this.BackButton.Name = "BackButton";
+			this.BackButton.Size = new System.Drawing.Size(35, 21);
+			this.BackButton.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+			this.BackButton.TabIndex = 1;
+			this.BackButton.TabStop = false;
+			// 
+			// pictureBox1
+			// 
+			this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
+			this.pictureBox1.Location = new System.Drawing.Point(196, 12);
+			this.pictureBox1.Name = "pictureBox1";
+			this.pictureBox1.Size = new System.Drawing.Size(688, 367);
+			this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+			this.pictureBox1.TabIndex = 0;
+			this.pictureBox1.TabStop = false;
+			// 
+			// PresetNameLabel
+			// 
+			this.PresetNameLabel.AutoSize = true;
+			this.PresetNameLabel.Font = new System.Drawing.Font("Nirmala UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.PresetNameLabel.Location = new System.Drawing.Point(7, 42);
+			this.PresetNameLabel.Name = "PresetNameLabel";
+			this.PresetNameLabel.Size = new System.Drawing.Size(57, 13);
+			this.PresetNameLabel.TabIndex = 29;
+			this.PresetNameLabel.Text = "Set name:";
+			// 
+			// PresetNameTextbox
+			// 
+			this.PresetNameTextbox.Location = new System.Drawing.Point(91, 39);
+			this.PresetNameTextbox.Name = "PresetNameTextbox";
+			this.PresetNameTextbox.Size = new System.Drawing.Size(98, 20);
+			this.PresetNameTextbox.TabIndex = 30;
 			// 
 			// LeftJoystickButton
 			// 
@@ -336,17 +361,6 @@
 			this.AButton.TabIndex = 4;
 			this.AButton.TabStop = false;
 			// 
-			// StartButton
-			// 
-			this.StartButton.Cursor = System.Windows.Forms.Cursors.Hand;
-			this.StartButton.Image = global::MK2360.Properties.Resources.x360_button_start;
-			this.StartButton.Location = new System.Drawing.Point(574, 104);
-			this.StartButton.Name = "StartButton";
-			this.StartButton.Size = new System.Drawing.Size(35, 21);
-			this.StartButton.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-			this.StartButton.TabIndex = 3;
-			this.StartButton.TabStop = false;
-			// 
 			// DpadButton
 			// 
 			this.DpadButton.BackColor = System.Drawing.Color.DarkGray;
@@ -359,45 +373,23 @@
 			this.DpadButton.TabIndex = 2;
 			this.DpadButton.TabStop = false;
 			// 
-			// BackButton
-			// 
-			this.BackButton.Cursor = System.Windows.Forms.Cursors.Hand;
-			this.BackButton.Image = global::MK2360.Properties.Resources.x360_button_back;
-			this.BackButton.Location = new System.Drawing.Point(459, 104);
-			this.BackButton.Name = "BackButton";
-			this.BackButton.Size = new System.Drawing.Size(35, 21);
-			this.BackButton.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-			this.BackButton.TabIndex = 1;
-			this.BackButton.TabStop = false;
-			// 
-			// pictureBox1
-			// 
-			this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-			this.pictureBox1.Location = new System.Drawing.Point(196, 12);
-			this.pictureBox1.Name = "pictureBox1";
-			this.pictureBox1.Size = new System.Drawing.Size(688, 367);
-			this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-			this.pictureBox1.TabIndex = 0;
-			this.pictureBox1.TabStop = false;
-			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.Color.WhiteSmoke;
 			this.ClientSize = new System.Drawing.Size(880, 526);
-			this.Controls.Add(this.KeyPanel);
+			this.Controls.Add(this.PresetNameTextbox);
+			this.Controls.Add(this.PresetNameLabel);
 			this.Controls.Add(this.KillSwitchTextBox);
 			this.Controls.Add(this.KillSwitchKey);
-			this.Controls.Add(this.button1);
+			this.Controls.Add(this.ControllerModeButton);
 			this.Controls.Add(this.CreditsButton);
 			this.Controls.Add(this.DeleteButton);
 			this.Controls.Add(this.ProcessComboBox);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.LogTextBox);
 			this.Controls.Add(this.PresetList);
-			this.Controls.Add(this.PresetNameTextbox);
-			this.Controls.Add(this.label1);
 			this.Controls.Add(this.SavePresetButton);
 			this.Controls.Add(this.NewPresetButton);
 			this.Controls.Add(this.PresetLabel);
@@ -422,16 +414,16 @@
 			((System.ComponentModel.ISupportInitialize)(this.RBButton)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.LTButton)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.LBButton)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.StartButton)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.BackButton)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.LeftJoystickButton)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.RightJoystickButton)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.XButton)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.BButton)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.YButton)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.AButton)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.StartButton)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.DpadButton)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.BackButton)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -456,18 +448,17 @@
         private System.Windows.Forms.Label PresetLabel;
         private System.Windows.Forms.Button NewPresetButton;
         private System.Windows.Forms.Button SavePresetButton;
-        private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.TextBox LogTextBox;
+		private ReadOnlyTextBox LogTextBox;
 		private System.Windows.Forms.Label label2;
 		public System.Windows.Forms.ComboBox PresetList;
-		public System.Windows.Forms.TextBox PresetNameTextbox;
 		public System.Windows.Forms.ComboBox ProcessComboBox;
 		private System.Windows.Forms.Button DeleteButton;
 		private System.Windows.Forms.Button CreditsButton;
-		private System.Windows.Forms.Button button1;
+		private System.Windows.Forms.Button ControllerModeButton;
 		private System.Windows.Forms.Label KillSwitchKey;
 		public System.Windows.Forms.TextBox KillSwitchTextBox;
-		private System.Windows.Forms.Panel KeyPanel;
+		private System.Windows.Forms.Label PresetNameLabel;
+		public System.Windows.Forms.TextBox PresetNameTextbox;
 	}
 }
 
