@@ -1,45 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MK2360
 {
 	class KeyPanelClass
 	{
-		Key m_pKey;
-		KeyType m_KeyType;
 		private static object m_CurrentPanel = null;
 		public static object CurrentPanel
 		{
-			get
-			{
-				return m_CurrentPanel;
-			}
+			get => m_CurrentPanel;
 			set
 			{
-				if(m_CurrentPanel != null)
+				if (m_CurrentPanel != null)
 				{
 					((Panel)(m_CurrentPanel)).Dispose();
 				}
 
 				m_CurrentPanel = value;
 			}
-		}
-
-
-		public enum KeyType
-		{
-			Button,
-			Joystick,
-			DPad
-		}
-
-		public KeyPanelClass(Panel p, KeyType k)
-		{
-			
 		}
 	}
 
@@ -294,18 +272,27 @@ namespace MK2360
 		{
 			Text = "Press any key..";
 			Input.AddKeyListener(OnKeyPress);
-			Click -= BindControl_Click;
 		}
 		private Input.InputAction OnKeyPress(Input key)
 		{
+			if(key.m_InputState == Input.InputState.Up)
+			{
+				return Input.InputAction.Continue;
+			}
+
 			if(key.m_InputType == Input.InputType.Mouse)
 			{
 				Interception.MouseStroke s = key.Stroke;
 				if (s.state == 0)
 				{
-					Click += new EventHandler(BindControl_Click);
 					return Input.InputAction.Continue;
 				}
+			}
+
+			if(key.m_InputType == Input.InputType.Keyboard && key.Code.ToString() == Config.m_Config.KillSwitch.ToString())
+			{
+				Form1.Log("Please avoid binding keys to the same key as your kill switch key.");
+				return Input.InputAction.Continue;
 			}
 
 			m_Key.m_InputType        = key.m_InputType;

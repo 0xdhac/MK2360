@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
 
 namespace MK2360
 {
 	public class Input
 	{
-		public enum InputType
-		{
-			Keyboard,
-			Mouse
-		};
-
+		public static bool[] DIK_KeyState = new bool[Enum.GetNames(typeof(Input.DIK)).Length];
+		public static bool[] Mouse_KeyState = new bool[Enum.GetNames(typeof(Input.MouseInput)).Length];
 		public InputType m_InputType;
+		public InputState m_InputState;
 		public Interception.Stroke Stroke;
 		public object Code;
 
@@ -23,6 +18,21 @@ namespace MK2360
 			m_InputType = InputType.Keyboard;
 			Stroke     = s;
 			Code = (DIK)(s.code);
+
+			if (s.state == (ushort)Interception.KeyState.KeyDown)
+			{
+				m_InputState = InputState.Down;
+				DIK_KeyState[(int)Code] = true;
+			}
+			else if (s.state == (ushort)Interception.KeyState.KeyUp)
+			{
+				m_InputState = InputState.Up;
+				DIK_KeyState[(int)Code] = false;
+			}
+			else
+			{
+				m_InputState = InputState.Invalid;
+			}	
 		}
 		public Input(Interception.MouseStroke s)
 		{
@@ -32,24 +42,34 @@ namespace MK2360
 			if (s.state == (ushort)Interception.MouseState.LeftDown || s.state == (ushort)Interception.MouseState.LeftUp)
 			{
 				Code = MouseInput.LeftMouse;
+				m_InputState = (s.state == (ushort)Interception.MouseState.LeftDown) ? InputState.Down : InputState.Up;
+				Mouse_KeyState[(int)Code] = (m_InputState == InputState.Down) ? true : false;
 			}
 			else if (s.state == (ushort)Interception.MouseState.RightDown || s.state == (ushort)Interception.MouseState.RightUp)
 			{
 				Code = MouseInput.RightMouse;
+				m_InputState = (s.state == (ushort)Interception.MouseState.RightDown) ? InputState.Down : InputState.Up;
+				Mouse_KeyState[(int)Code] = (m_InputState == InputState.Down) ? true : false;
 			}
 			else if (s.state == (ushort)Interception.MouseState.MiddleDown || s.state == (ushort)Interception.MouseState.MiddleUp)
 			{
 				Code = MouseInput.MiddleMouse;
+				m_InputState = (s.state == (ushort)Interception.MouseState.MiddleDown) ? InputState.Down : InputState.Up;
+				Mouse_KeyState[(int)Code] = (m_InputState == InputState.Down) ? true : false;
 			}
 			else if (s.state == (ushort)Interception.MouseState.Button4Down || s.state == (ushort)Interception.MouseState.Button4Up)
 			{
 				Code = MouseInput.Button4;
+				m_InputState = (s.state == (ushort)Interception.MouseState.Button4Down) ? InputState.Down : InputState.Up;
+				Mouse_KeyState[(int)Code] = (m_InputState == InputState.Down) ? true : false;
 			}
 			else if (s.state == (ushort)Interception.MouseState.Button5Down || s.state == (ushort)Interception.MouseState.Button5Up)
 			{
 				Code = MouseInput.Button5;
+				m_InputState = (s.state == (ushort)Interception.MouseState.Button5Down) ? InputState.Down : InputState.Up;
+				Mouse_KeyState[(int)Code] = (m_InputState == InputState.Down) ? true : false;
 			}
-			else if (s.state == (ushort)Interception.MouseState.MouseWheel)
+			else if (s.state == (ushort)Interception.MouseState.MouseWheel || s.state == (ushort)Interception.MouseState.MouseHWheel)
 			{
 				if (s.rolling > 0)
 				{
@@ -59,10 +79,12 @@ namespace MK2360
 				{
 					Code = MouseInput.WheelDown;
 				}
+
+				m_InputState = InputState.Impulse;
 			}
 			else
 			{
-				Code = MouseInput.Invalid;
+				Code = MouseInput.Move;
 			}
 		}
 
@@ -96,6 +118,34 @@ namespace MK2360
 			return result;
 		}
 
+		public static bool GetKeyState(Key k)
+		{
+			if (k.m_InputType == InputType.Keyboard)
+			{
+				int idx = (int)Enum.Parse(typeof(DIK), k.Code.ToString());
+				return DIK_KeyState[idx];
+			}
+			else if(k.m_InputType == InputType.Mouse)
+			{
+				int idx = (int)Enum.Parse(typeof(MouseInput), k.Code.ToString());
+				return Mouse_KeyState[idx];
+			}
+
+			Form1.Log("Input.cs GetKeyState - Shouldn't see this msg");
+			return false;
+		}
+		public enum InputType
+		{
+			Keyboard,
+			Mouse
+		}
+		public enum InputState
+		{
+			Down,
+			Up,
+			Impulse,
+			Invalid
+		}
 		public enum InputAction
 		{
 			Continue = 1,
@@ -105,7 +155,7 @@ namespace MK2360
 		}
 		public enum MouseInput
 		{
-			Invalid = -1,
+			Invalid,
 			LeftMouse,
 			RightMouse,
 			MiddleMouse,
@@ -257,13 +307,13 @@ namespace MK2360
 		public Key(Input.MouseInput p)
 		{
 			m_InputType = Input.InputType.Mouse;
-			Code       = p;
+			Code        = p;
 		}
 
 		public Key(Input.DIK p)
 		{
 			m_InputType = Input.InputType.Keyboard;
-			Code       = p;
+			Code        = p;
 		}
 
 		public Key() { }
@@ -273,14 +323,31 @@ namespace MK2360
 			return Code.ToString();
 		}
 
+		public override bool Equals(object obj)
+		{
+			return obj is Key key &&
+				   m_InputType == key.m_InputType &&
+				   EqualityComparer<object>.Default.Equals(Code, key.Code);
+		}
+
 		public static bool operator ==(Key a, Input b)
 		{
-			return (a.m_InputType == b.m_InputType && a.Code == b.Code);
+			return (a.m_InputType == b.m_InputType && a.Code.ToString() == b.Code.ToString());
 		}
 
 		public static bool operator !=(Key a, Input b)
 		{
-			return !(a.m_InputType == b.m_InputType && a.Code == b.Code);
+			return !(a.m_InputType == b.m_InputType && a.Code.ToString() == b.Code.ToString());
+		}
+
+		public static bool operator ==(Input b, Key a)
+		{
+			return (a.m_InputType == b.m_InputType && a.Code.ToString() == b.Code.ToString());
+		}
+
+		public static bool operator !=(Input b, Key a)
+		{
+			return !(a.m_InputType == b.m_InputType && a.Code.ToString() == b.Code.ToString());
 		}
 	}
 

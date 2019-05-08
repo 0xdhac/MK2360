@@ -32,7 +32,7 @@ namespace MK2360
 				{
 					Config.m_Config = Toml.ReadFile<Config>("config.cfg");
 				}
-				catch(ArgumentNullException a)
+				catch (ArgumentNullException a)
 				{
 					Log(a.Message);
 				}
@@ -49,11 +49,11 @@ namespace MK2360
 			}
 			else
 			{
-				if(Preset.Exists(Config.m_Config.m_Preset))
+				if (Preset.Exists(Config.m_Config.m_Preset))
 				{
 					Preset.Current = Preset.Get(Config.m_Config.m_Preset);
 				}
-				else if(Preset.GetCount() > 0)
+				else if (Preset.GetCount() > 0)
 				{
 					Log("Current preset no longer exists. Attempting to use another preset.");
 					Preset.Current = Preset.GetFirst();
@@ -68,7 +68,7 @@ namespace MK2360
 					Preset.Current = p;
 				}
 			}
-			
+
 			Thread t = new Thread(Intercept);
 			t.IsBackground = true;
 			t.Start();
@@ -81,40 +81,39 @@ namespace MK2360
 
 			// Update UI
 			UpdatePresetList();
-			FormBorderStyle								= FormBorderStyle.FixedSingle;
-			MaximizeBox									= false;
-			PresetList.SelectedItem						= Preset.Current;
-			PresetList.Text								= Preset.Current.m_Name;
-			PresetList.SelectedIndexChanged				+= PresetList_SelectedIndexChanged;
-			ProcessComboBox.SelectedIndexChanged		+= ProcessList_SelectedIndexChanged;
-			ProcessComboBox.DropDown					+= ProcessComboBox_DropDown;
-			ProcessComboBox.DropDownWidth				= 350;
-			LogTextBox.ScrollBars						= ScrollBars.Vertical;
+			FormBorderStyle = FormBorderStyle.FixedSingle;
+			MaximizeBox = false;
+			PresetList.SelectedItem = Preset.Current;
+			PresetList.Text = Preset.Current.m_Name;
+			PresetList.SelectedIndexChanged += PresetList_SelectedIndexChanged;
+			ProcessComboBox.SelectedIndexChanged += ProcessList_SelectedIndexChanged;
+			ProcessComboBox.DropDown += ProcessComboBox_DropDown;
+			ProcessComboBox.DropDownWidth = 350;
+			LogTextBox.ScrollBars = ScrollBars.Vertical;
 
 			// Bindings
-			ControllerModeButton.Click	+= ControllerModeButton_Click;
-			KillSwitchTextBox.Click		+= KillSwitchTextBox_Clicked;
-			AButton.Click				+= AButton_Click;
-			YButton.Click				+= YButton_Click;
-			XButton.Click				+= XButton_Click;
-			BButton.Click				+= BButton_Click;
-			StartButton.Click			+= StartButton_Click;
-			BackButton.Click			+= BackButton_Click;
-			RightJoystickButton.Click	+= RightJoy_Click;
-			LeftJoystickButton.Click	+= LeftJoy_Click;
-			DpadButton.Click			+= DPad_Click;
-			LTButton.Click				+= LTrigger_Click;
-			LBButton.Click				+= LBButton_Click;
-			RTButton.Click				+= RTrigger_Click;
-			RBButton.Click				+= RBButton_Click;
-			
+			ControllerModeButton.Click += ControllerModeButton_Click;
+			KillSwitchTextBox.Click += KillSwitchTextBox_Clicked;
+			AButton.Click += AButton_Click;
+			YButton.Click += YButton_Click;
+			XButton.Click += XButton_Click;
+			BButton.Click += BButton_Click;
+			StartButton.Click += StartButton_Click;
+			BackButton.Click += BackButton_Click;
+			RightJoystickButton.Click += RightJoy_Click;
+			LeftJoystickButton.Click += LeftJoy_Click;
+			DpadButton.Click += DPad_Click;
+			LTButton.Click += LTrigger_Click;
+			LBButton.Click += LBButton_Click;
+			RTButton.Click += RTrigger_Click;
+			RBButton.Click += RBButton_Click;
 
 			ControllerModeButton.FlatStyle = FlatStyle.Flat;
 		}
 
 		private void ControllerModeButton_Click(object sender, EventArgs e)
 		{
-			if(XMode.IsActive())
+			if (XMode.IsActive())
 			{
 				XMode.Stop(true);
 			}
@@ -139,6 +138,7 @@ namespace MK2360
 					NewPresetButton.Hide();
 					SavePresetButton.Hide();
 					DeleteButton.Hide();
+					KeyPanelClass.CurrentPanel = null;
 				}));
 			}
 			else
@@ -152,6 +152,7 @@ namespace MK2360
 				NewPresetButton.Hide();
 				SavePresetButton.Hide();
 				DeleteButton.Hide();
+				KeyPanelClass.CurrentPanel = null;
 			}
 		}
 
@@ -347,7 +348,7 @@ namespace MK2360
 		}
 		private void ProcessList_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			if(Preset.Current != null)
+			if (Preset.Current != null)
 			{
 				Preset.Current.m_ProcessItem = (ProcessItem)ProcessComboBox.SelectedItem;
 			}
@@ -375,8 +376,8 @@ namespace MK2360
 			Interception.interception_set_filter(
 				context,
 				interception_is_keyboard,
-				((ushort)Interception.FilterKeyState.KeyDown | 
-				(ushort)Interception.KeyState.KeyUp));
+				((ushort)Interception.FilterKeyState.KeyDown |
+				(ushort)Interception.FilterKeyState.KeyUp));
 
 			// Check for mouse changes
 			Interception.InterceptionPredicate interception_is_mouse = Interception.interception_is_mouse;
@@ -395,9 +396,9 @@ namespace MK2360
 
 					Input.InputAction act = i.CallKeyListeners();
 
-					if((act & Input.InputAction.Block) == 0)
+					if ((act & Input.InputAction.Block) == 0)
 					{
-						if((act & Input.InputAction.Change) > 0)
+						if ((act & Input.InputAction.Change) > 0)
 						{
 
 						}
@@ -408,11 +409,6 @@ namespace MK2360
 				else if (Interception.interception_is_mouse(device) != 0)
 				{
 					Interception.MouseStroke kstroke = stroke;
-
-					if(kstroke.state == (ushort)Interception.MouseState.MouseWheel)
-					{
-						Log(kstroke.rolling.ToString());
-					}
 
 					Input i = new Input(kstroke);
 
@@ -441,8 +437,8 @@ namespace MK2360
 			Preset.Current.m_Name = ((ComboBox)(sender)).Text;
 		}
 		private void NewPresetButton_Click(object sender, EventArgs e)
-        {
-            Preset p = new Preset();
+		{
+			Preset p = new Preset();
 			p.m_Name = Preset.GetNextAvailableName();
 			Log("Created new preset '" + p.m_Name + "'.");
 			p.Save();
@@ -450,22 +446,22 @@ namespace MK2360
 			UpdatePresetList();
 			PresetList.SelectedItem = p;
 			PresetList.Text = p.m_Name;
-        }
-        public void UpdatePresetList()
-        {
-            PresetList.Items.Clear();
+		}
+		public void UpdatePresetList()
+		{
+			PresetList.Items.Clear();
 
-            string[] files = Directory.GetFiles(Preset.m_Path + "/", "*." + Preset.m_FileType, SearchOption.TopDirectoryOnly);
-            foreach(string s in files)
-            {
+			string[] files = Directory.GetFiles(Preset.m_Path + "/", "*." + Preset.m_FileType, SearchOption.TopDirectoryOnly);
+			foreach (string s in files)
+			{
 				PresetList.Items.Add(Toml.ReadFile<Preset>(s));
-            }
-        }
+			}
+		}
 		public void UpdateProcessList()
 		{
 			ProcessComboBox.Items.Clear();
 
-			if(Preset.Current.m_ProcessItem != null)
+			if (Preset.Current.m_ProcessItem != null)
 			{
 				ProcessComboBox.Items.Add(Preset.Current.m_ProcessItem);
 				ProcessComboBox.SelectedIndex = 0;
@@ -479,7 +475,7 @@ namespace MK2360
 					continue;
 
 				// Don't show processes that aren't even available
-				if(p.Threads[0].ThreadState == System.Diagnostics.ThreadState.Wait && p.Threads[0].WaitReason == ThreadWaitReason.Suspended)
+				if (p.Threads[0].ThreadState == System.Diagnostics.ThreadState.Wait && p.Threads[0].WaitReason == ThreadWaitReason.Suspended)
 					continue;
 
 				// Don't show processes that arent winform applications
@@ -492,16 +488,16 @@ namespace MK2360
 				}
 			}
 		}
-        private void SavePresetButton_Click(object sender, EventArgs e)
-        {
+		private void SavePresetButton_Click(object sender, EventArgs e)
+		{
 			int index = PresetList.SelectedIndex;
 			if (PresetNameTextbox.Text.Length > 0 &&
 				PresetNameTextbox.Text != Preset.Current.m_Name)
-            {
+			{
 				if (PresetNameTextbox.Text.IndexOfAny(Path.GetInvalidPathChars()) == -1 &&
 				PresetNameTextbox.Text.IndexOfAny(Path.GetInvalidFileNameChars()) == -1)
 				{
-					if(!Preset.Exists(PresetNameTextbox.Text))
+					if (!Preset.Exists(PresetNameTextbox.Text))
 					{
 						if (Preset.Rename(Preset.Current, PresetNameTextbox.Text))
 						{
@@ -523,7 +519,7 @@ namespace MK2360
 			Preset.Current.Save();
 
 			UpdatePresetList();
-			PresetList.SelectedIndex = index;	
+			PresetList.SelectedIndex = index;
 		}
 		public static void Log(string s)
 		{
@@ -541,11 +537,11 @@ namespace MK2360
 		}
 		private void DeleteButton_Click(object sender, EventArgs e)
 		{
-			if(Preset.GetCount() == 1)
+			if (Preset.GetCount() == 1)
 			{
 				Log("Can't delete because it's your only preset.");
 			}
-			else if(Preset.Current != null)
+			else if (Preset.Current != null)
 			{
 				Preset.Current.Delete();
 			}
@@ -566,7 +562,7 @@ namespace MK2360
 		}
 		private Input.InputAction OnKillSwitchKeyChanged(Input key)
 		{
-			if(key.m_InputType == Input.InputType.Keyboard)
+			if (key.m_InputType == Input.InputType.Keyboard)
 			{
 				Interception.KeyStroke ks = key.Stroke;
 
@@ -579,46 +575,6 @@ namespace MK2360
 			{
 				return Input.InputAction.Continue;
 			}
-		}
-	}
-
-	public class Config
-	{
-		public static Config m_Config;
-		public string m_Preset { get; set; }
-		private Input.DIK m_KillSwitch;
-		public Input.DIK KillSwitch
-		{
-			get
-			{
-				return m_KillSwitch;
-			}
-			set
-			{
-				m_KillSwitch = value;
-
-				if(Form1.MainForm.InvokeRequired)
-				{
-					Form1.MainForm.Invoke(new Action(() => Form1.MainForm.KillSwitchTextBox.Text = m_KillSwitch.ToString()));
-				}
-				else
-				{
-					Form1.MainForm.KillSwitchTextBox.Text = m_KillSwitch.ToString();
-				}
-			}
-		}
-
-		public void Save()
-		{
-			Toml.WriteFile(this, "config.cfg");
-		}
-		public static void Load()
-		{
-			m_Config = Toml.ReadFile<Config>("config.cfg");
-		}
-		public static bool Exists()
-		{
-			return File.Exists("config.cfg");
 		}
 	}
 

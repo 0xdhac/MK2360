@@ -13,9 +13,19 @@ namespace MK2360
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
+			Application.ApplicationExit += new EventHandler(OnApplicationExit);
+
+			Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
         }
+
+		private static void OnApplicationExit(object sender, EventArgs e)
+		{
+			if(XMode.IsActive())
+			{
+				XMode.Stop(true);
+			}
+		}
     }
 }

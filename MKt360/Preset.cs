@@ -40,8 +40,7 @@ namespace MK2360
 
 				// Update UI information based on the current preset
 				Form1.MainForm.ProcessComboBox.Enabled = true;
-				//Form1.MainForm.PresetNameTextbox.Enabled = true;
-				//Form1.MainForm.UpdateProcessList();
+				Form1.MainForm.PresetNameTextbox.Enabled = true;
 				Form1.MainForm.PresetList.SelectedItem = m_Current;
 				Form1.MainForm.PresetList.Text = m_Current.m_Name;
 				Form1.MainForm.PresetNameTextbox.Text = m_Current.m_Name;
@@ -165,6 +164,46 @@ namespace MK2360
 		public override string ToString()
 		{
 			return m_Name;
+		}
+	}
+
+	public class Config
+	{
+		public static Config m_Config;
+		public string m_Preset { get; set; }
+		private Input.DIK m_KillSwitch;
+		public Input.DIK KillSwitch
+		{
+			get
+			{
+				return m_KillSwitch;
+			}
+			set
+			{
+				m_KillSwitch = value;
+
+				if (Form1.MainForm.InvokeRequired)
+				{
+					Form1.MainForm.Invoke(new Action(() => Form1.MainForm.KillSwitchTextBox.Text = m_KillSwitch.ToString()));
+				}
+				else
+				{
+					Form1.MainForm.KillSwitchTextBox.Text = m_KillSwitch.ToString();
+				}
+			}
+		}
+
+		public void Save()
+		{
+			Toml.WriteFile(this, "config.cfg");
+		}
+		public static void Load()
+		{
+			m_Config = Toml.ReadFile<Config>("config.cfg");
+		}
+		public static bool Exists()
+		{
+			return File.Exists("config.cfg");
 		}
 	}
 }
