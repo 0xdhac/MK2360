@@ -55,19 +55,10 @@ namespace MK2360
 
 		public static string GetNextAvailableName()
 		{
-			try
-			{
-				string[] files = Directory.GetFiles(m_Path + "/", "*." + m_FileType, SearchOption.TopDirectoryOnly);
-				int count      = files.GetLength(0) + 1;
+			int count = 0;
+			while (File.Exists(m_Path + "/" + m_DefaultName + ++count + "." + m_FileType));
 
-				return m_DefaultName + count;
-			}
-			catch(Exception ex)
-			{
-				Form1.Log(ex.Message);
-
-				return "";
-			}
+			return m_DefaultName + count;
 		}
 
 		public static bool Rename(Preset preset, string name)
@@ -171,27 +162,9 @@ namespace MK2360
 	{
 		public static Config m_Config;
 		public string m_Preset { get; set; }
-		private Input.DIK m_KillSwitch;
-		public Input.DIK KillSwitch
-		{
-			get
-			{
-				return m_KillSwitch;
-			}
-			set
-			{
-				m_KillSwitch = value;
-
-				if (Form1.MainForm.InvokeRequired)
-				{
-					Form1.MainForm.Invoke(new Action(() => Form1.MainForm.KillSwitchTextBox.Text = m_KillSwitch.ToString()));
-				}
-				else
-				{
-					Form1.MainForm.KillSwitchTextBox.Text = m_KillSwitch.ToString();
-				}
-			}
-		}
+		public int m_Sens { get; set; } = 2800;
+		public int m_AntiAccelerationOffset { get; set; } = 2500;
+		public Input.DIK m_KillSwitch { get; set; } = Input.DIK.F9;
 
 		public void Save()
 		{

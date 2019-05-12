@@ -111,9 +111,9 @@ namespace MK2360
 				{
 					remove.Add(k);
 				}
-
-				Listeners = Listeners.Except(remove).ToList();
 			}
+
+			Listeners = Listeners.Except(remove).ToList();
 
 			return result;
 		}
@@ -304,19 +304,13 @@ namespace MK2360
 		public Input.InputType m_InputType { get; set; }
 		public object Code { get; set; }
 
-		public Key(Input.MouseInput p)
-		{
-			m_InputType = Input.InputType.Mouse;
-			Code        = p;
-		}
-
-		public Key(Input.DIK p)
-		{
-			m_InputType = Input.InputType.Keyboard;
-			Code        = p;
-		}
-
 		public Key() { }
+
+		public Key(Input.InputType m_InputType, object code)
+		{
+			this.m_InputType = m_InputType;
+			Code = code;
+		}
 
 		public override string ToString()
 		{
@@ -328,6 +322,14 @@ namespace MK2360
 			return obj is Key key &&
 				   m_InputType == key.m_InputType &&
 				   EqualityComparer<object>.Default.Equals(Code, key.Code);
+		}
+
+		public override int GetHashCode()
+		{
+			var hashCode = -1670320561;
+			hashCode = hashCode * -1521134295 + m_InputType.GetHashCode();
+			hashCode = hashCode * -1521134295 + EqualityComparer<object>.Default.GetHashCode(Code);
+			return hashCode;
 		}
 
 		public static bool operator ==(Key a, Input b)
@@ -353,33 +355,33 @@ namespace MK2360
 
 	public class BindList
 	{
-		public Key StartButton { get; set; } = new Key(Input.DIK.Invalid);
-		public Key BackButton { get; set; } = new Key(Input.DIK.Invalid);
-		public Key YButton { get; set; } = new Key(Input.DIK.Invalid);
-		public Key XButton { get; set; } = new Key(Input.DIK.Invalid);
-		public Key AButton { get; set; } = new Key(Input.DIK.Space);
-		public Key BButton { get; set; } = new Key(Input.DIK.Invalid);
-		public Key RightJoyPress { get; set; } = new Key(Input.DIK.Invalid);
+		public Key StartButton { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
+		public Key BackButton { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
+		public Key YButton { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
+		public Key XButton { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
+		public Key AButton { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Space);
+		public Key BButton { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
+		public Key RightJoyPress { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
 		public Input.InputType RightJoyType { get; set; } = Input.InputType.Mouse;
-		public Key RightJoyMove { get; set; } = new Key(Input.MouseInput.Move);
-		public Key RightJoyUp { get; set; } = new Key(Input.DIK.W);
-		public Key RightJoyDown { get; set; } = new Key(Input.DIK.S);
-		public Key RightJoyRight { get; set; } = new Key(Input.DIK.D);
-		public Key RightJoyLeft { get; set; } = new Key(Input.DIK.A);
-		public Key LeftJoyPress { get; set; } = new Key(Input.DIK.Invalid);
+		public Key RightJoyMove { get; set; } = new Key(Input.InputType.Mouse, Input.MouseInput.Move);
+		public Key RightJoyUp { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.W);
+		public Key RightJoyDown { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.S);
+		public Key RightJoyRight { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.D);
+		public Key RightJoyLeft { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.A);
+		public Key LeftJoyPress { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
 		public Input.InputType LeftJoyType { get; set; } = Input.InputType.Keyboard;
-		public Key LeftJoyMove { get; set; } = new Key(Input.MouseInput.Move);
-		public Key LeftJoyUp { get; set; } = new Key(Input.DIK.W);
-		public Key LeftJoyDown { get; set; } = new Key(Input.DIK.S);
-		public Key LeftJoyRight { get; set; } = new Key(Input.DIK.D);
-		public Key LeftJoyLeft { get; set; } = new Key(Input.DIK.A);
-		public Key DPadUp { get; set; } = new Key(Input.DIK.Invalid);
-		public Key DPadDown { get; set; } = new Key(Input.DIK.Invalid);
-		public Key DPadRight { get; set; } = new Key(Input.DIK.Invalid);
-		public Key DPadLeft { get; set; } = new Key(Input.DIK.Invalid);
-		public Key LeftTrigger { get; set; } = new Key(Input.DIK.Invalid);
-		public Key LeftBumper { get; set; } = new Key(Input.DIK.Invalid);
-		public Key RightTrigger { get; set; } = new Key(Input.DIK.Invalid);
-		public Key RightBumper { get; set; } = new Key(Input.DIK.Invalid);
+		public Key LeftJoyMove { get; set; } = new Key(Input.InputType.Mouse, Input.MouseInput.Move);
+		public Key LeftJoyUp { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.W);
+		public Key LeftJoyDown { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.S);
+		public Key LeftJoyRight { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.D);
+		public Key LeftJoyLeft { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.A);
+		public Key DPadUp { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
+		public Key DPadDown { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
+		public Key DPadRight { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
+		public Key DPadLeft { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
+		public Key LeftTrigger { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
+		public Key LeftBumper { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
+		public Key RightTrigger { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
+		public Key RightBumper { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
 	}
 }

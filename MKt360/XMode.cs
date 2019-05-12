@@ -11,12 +11,15 @@ namespace MK2360
 {
 	public class XMode
 	{
-		private static Stopwatch m_Stopwatch = new Stopwatch();
+		private const int m_SampleCount			= 3;
+		private static List<Pair> m_Past		= new List<Pair>();
+		private static long m_LastElapsed		= 0;
+		private static Stopwatch m_Stopwatch	= new Stopwatch();
+		private static bool m_bStopThread		= false;
+		private static ScpBus m_Bus				= new ScpBus();
+		private static X360Controller m_Ctrlr	= new X360Controller();
+		private static bool m_Active			= false;
 		private static Thread m_MouseThread;
-		private static bool m_bStopThread = false;
-		private static ScpBus m_Bus = new ScpBus();
-		private static X360Controller m_Ctrlr = new X360Controller();
-		private static bool m_Active = false;
 		public static bool Start()
 		{
 			if(m_Active == true){
@@ -73,27 +76,33 @@ namespace MK2360
 			return m_Active;
 		}
 
-		private static Input.InputAction OnKeyPress(Input i){
-			if (m_Active == false){
+		private static Input.InputAction OnKeyPress(Input i)
+		{
+			if (m_Active == false)
+			{
 				return Input.InputAction.Continue;
 			}
 
-			if(i.m_InputType == Input.InputType.Keyboard && Config.m_Config.KillSwitch == (Input.DIK)i.Code){
+			if(i.m_InputType == Input.InputType.Keyboard && Config.m_Config.m_KillSwitch == (Input.DIK)i.Code)
+			{
 				Stop(false);
 				return Input.InputAction.Stop;
 			}
 
 			var active = GetActiveWindowTitle();
 
-			if(active == null){
+			if(active == null)
+			{
 				return Input.InputAction.Continue;
 			}
 
-			if (active.Trim() != Preset.Current.m_ProcessItem.m_Display.Trim()){
+			if (active.Trim() != Preset.Current.m_ProcessItem.m_Display.Trim())
+			{
 				return Input.InputAction.Continue;
 			}
 
-			if (i.m_InputState == Input.InputState.Invalid){
+			if (i.m_InputState == Input.InputState.Invalid)
+			{
 				return Input.InputAction.Continue;
 			}
 
@@ -105,6 +114,7 @@ namespace MK2360
 		private static void ConvertTo360(Input i)
 		{
 			BindList b = Preset.Current.m_BindList;
+			bool bPastUpdated = false;
 
 			if(i == b.AButton){
 				if(i.m_InputState == Input.InputState.Down){
@@ -394,9 +404,11 @@ namespace MK2360
 					m_Ctrlr.RightStickX = x;
 				}
 			}
-			else if(i.m_InputType == Input.InputType.Mouse) // Create another function/thread that regularly checks if the mouse has been moved for a certain amount of time to undo any changes here
+			else if(i.m_InputType == Input.InputType.Mouse)
 			{
-				CalcJoy(i, value => m_Ctrlr.RightStickX = value, value => m_Ctrlr.RightStickY = value);
+				UpdatePast(i);
+				bPastUpdated = true;
+				CalcJoy(value => m_Ctrlr.RightStickX = value, value => m_Ctrlr.RightStickY = value);
 			}
 
 			if (b.LeftJoyType == Input.InputType.Keyboard)
@@ -425,6 +437,12 @@ namespace MK2360
 					m_Ctrlr.LeftStickX = x;
 				}
 			}
+			else if (i.m_InputType == Input.InputType.Mouse)
+			{
+				if (!bPastUpdated)
+					UpdatePast(i);
+				CalcJoy(value => m_Ctrlr.LeftStickX = value, value => m_Ctrlr.LeftStickY = value);
+			}
 
 			m_Bus.Report(2, m_Ctrlr.GetReport());
 		}
@@ -438,15 +456,13 @@ namespace MK2360
 				m_Bus.Report(2, m_Ctrlr.GetReport());
 			});
 		}
-
-		private const int m_Sens = 5000;
-		private const int m_MinMaxSens = 15000;
-		private const int m_MinMinSens = 3000;
-		private const int m_SampleCount = 2;
-		private static List<Pair> m_Past = new List<Pair>();
-		private static long m_LastElapsed = 0;
-
-		private static void CalcJoy(Input i, Action<short> x, Action<short> y)
+		private static void CalcJoy(Action<short> x, Action<short> y)
+		{
+			Pair p = GetPastAverage();
+			x((short)p.x);
+			y((short)p.y);
+		}
+		private static void UpdatePast(Input i)
 		{
 			m_LastElapsed = m_Stopwatch.ElapsedMilliseconds;
 			// Get mouse data
@@ -455,52 +471,20 @@ namespace MK2360
 			int mY = strk.y;
 
 			// Convert data to joystick values
-			int convX = mX * (m_Sens);
-			int convY = -(mY * (m_Sens));
+			int convX = mX * Config.m_Config.m_Sens;
+			int convY = -(mY * Config.m_Config.m_Sens);
 
-			if (convX > 0){
-				convX += 7000;
-				if (convX >= m_MinMinSens && convX < m_MinMaxSens)
-					convX = m_MinMaxSens;
-			}
-			else if (convX < 0){
-				convX -= 7000;
-				if (convX <= -m_MinMinSens && convX > -m_MinMaxSens)
-					convX = -m_MinMaxSens;
-			}
-
-			if (convY > 0){
-				convY += 7000;
-				if (convY >= m_MinMinSens && convY < m_MinMaxSens)
-					convY = m_MinMaxSens;
-			}
-			else if (convY < 0){
-				convY -= 7000;
-				if (convY <= -m_MinMinSens && convY > -m_MinMaxSens)
-					convY = -m_MinMaxSens;
-			}
-
-			// Clamp values within range of min/max signed short values
-			if (convX < -32768)
-				convX = -32768;
-			else if (convX > 32767)
-				convX = 32767;
-
-			if (convY < -32768)
-				convY = -32768;
-			else if (convY > 32767)
-				convY = 32767;
+			int offset = Config.m_Config.m_AntiAccelerationOffset;
+			convX += (convX > 0) ? offset : ((convX < 0) ? -offset : 0);
+			convY += (convY > 0) ? offset : ((convY < 0) ? -offset : 0);
+			convX = (convX < short.MinValue) ? short.MinValue : ((convX > short.MaxValue) ? short.MaxValue : convX);
+			convY = (convY < short.MinValue) ? short.MinValue : ((convY > short.MaxValue) ? short.MaxValue : convY);
 
 			Pair p = new Pair(convX, convY);
 			m_Past.Add(p);
 			while (m_Past.Count > m_SampleCount)
 				m_Past.RemoveAt(0);
-
-			p = GetPastAverage();
-			x((short)p.x);
-			y((short)p.y);
 		}
-
 		private static void CheckMouse()
 		{
 			while(m_bStopThread == false)
@@ -536,7 +520,6 @@ namespace MK2360
 			}
 
 		}
-
 		private static Pair GetPastAverage()
 		{
 			int total = 0;

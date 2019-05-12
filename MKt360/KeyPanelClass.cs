@@ -67,6 +67,7 @@ namespace MK2360
 			m_InputType_Box.Size = new System.Drawing.Size(BindSize_X, BindSize_Y);
 			m_InputType_Box.Items.Add(Input.InputType.Keyboard);
 			m_InputType_Box.Items.Add(Input.InputType.Mouse);
+			m_InputType_Box.DropDownStyle = ComboBoxStyle.DropDownList;
 			m_InputType_Box.SelectedIndexChanged += new EventHandler(InputTypeChanged);
 
 			Controls.Add(m_BindUp_Label);
@@ -218,7 +219,7 @@ namespace MK2360
 
 	public class BindControl : TextBox
 	{
-		private Key m_Key = new Key(Input.DIK.Invalid);
+		private Key m_Key = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
 		public Key Key
 		{
 			set
@@ -289,7 +290,7 @@ namespace MK2360
 				}
 			}
 
-			if(key.m_InputType == Input.InputType.Keyboard && key.Code.ToString() == Config.m_Config.KillSwitch.ToString())
+			if(key.m_InputType == Input.InputType.Keyboard && key.Code.ToString() == Config.m_Config.m_KillSwitch.ToString())
 			{
 				Form1.Log("Please avoid binding keys to the same key as your kill switch key.");
 				return Input.InputAction.Continue;

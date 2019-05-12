@@ -23,7 +23,6 @@ namespace MK2360
 			if (!Config.Exists())
 			{
 				Config.m_Config = new Config();
-				Config.m_Config.KillSwitch = Input.DIK.F9;
 				Config.m_Config.Save();
 			}
 			else
@@ -37,6 +36,8 @@ namespace MK2360
 					Log(a.Message);
 				}
 			}
+
+			KillSwitchTextBox.Text = Config.m_Config.m_KillSwitch.ToString();
 
 			// Make sure there is a preset
 			if (Config.m_Config.m_Preset == "")
@@ -566,8 +567,10 @@ namespace MK2360
 			{
 				Interception.KeyStroke ks = key.Stroke;
 
-				Config.m_Config.KillSwitch = (Input.DIK)(ks.code);
+				Config.m_Config.m_KillSwitch = (Input.DIK)(ks.code);
 				Config.m_Config.Save();
+
+				Invoke(new Action(() => KillSwitchTextBox.Text = Config.m_Config.m_KillSwitch.ToString()));
 
 				return Input.InputAction.Stop;
 			}
