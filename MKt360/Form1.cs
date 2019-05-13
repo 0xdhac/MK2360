@@ -394,36 +394,19 @@ namespace MK2360
 				{
 					Interception.KeyStroke kstroke = stroke;
 					Input i = new Input(kstroke);
-
 					Input.InputAction act = i.CallKeyListeners();
 
 					if ((act & Input.InputAction.Block) == 0)
-					{
-						if ((act & Input.InputAction.Change) > 0)
-						{
-
-						}
-
 						Interception.interception_send(context, device, strokeBytes, 1);
-					}
 				}
 				else if (Interception.interception_is_mouse(device) != 0)
 				{
 					Interception.MouseStroke kstroke = stroke;
-
 					Input i = new Input(kstroke);
-
 					Input.InputAction act = i.CallKeyListeners();
 
 					if ((act & Input.InputAction.Block) == 0)
-					{
-						if ((act & Input.InputAction.Change) > 0)
-						{
-
-						}
-
 						Interception.interception_send(context, device, strokeBytes, 1);
-					}
 				}
 			}
 

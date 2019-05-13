@@ -11,9 +11,9 @@ namespace MK2360
 		public ProcessItem m_ProcessItem { get; set; }
 		public BindList m_BindList { get; set; } = new BindList();
 
-		public static string m_Path        = @"presets";
-		public static string m_FileType    = @"cfg";
-		public static string m_DefaultName = @"preset";
+		public static string m_Path        = "presets";
+		public static string m_FileType    = "cfg";
+		public static string m_DefaultName = "preset";
 		private static Preset m_Current;
 
 		public Preset()

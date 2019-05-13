@@ -11,6 +11,10 @@ namespace MK2360
 {
 	public class XMode
 	{
+		/*
+		[DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+		static extern bool CheckRemoteDebuggerPresent(IntPtr hProcess, ref bool isDebuggerPresent);
+		*/
 		private const int m_SampleCount			= 3;
 		private static List<Pair> m_Past		= new List<Pair>();
 		private static long m_LastElapsed		= 0;
@@ -22,7 +26,23 @@ namespace MK2360
 		private static Thread m_MouseThread;
 		public static bool Start()
 		{
-			if(m_Active == true){
+			/*
+			bool isDebuggerPresent = false;
+			CheckRemoteDebuggerPresent(Process.GetCurrentProcess().Handle, ref isDebuggerPresent);
+
+			if (isDebuggerPresent)
+			{
+				return false;
+			}
+
+			int unixTimestamp = (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+			if (unixTimestamp - 1557732990 > 604800)
+			{
+				return false;
+			}
+			*/
+
+			if (m_Active == true){
 				Form1.Log("Controller mode is already active.");
 				return false;
 			}
