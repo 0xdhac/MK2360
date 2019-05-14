@@ -26,6 +26,7 @@ namespace MK2360
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			Application.Run(new LoginForm());
+			Application.Exit();
 		}
 
 		private static void OnApplicationExit(object sender, EventArgs e)
