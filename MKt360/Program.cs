@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using Nett;
+using System.Diagnostics;
 
 namespace MK2360
 {
@@ -22,6 +23,9 @@ namespace MK2360
 			}
 			*/
 
+			using (Process p = Process.GetCurrentProcess())
+				p.PriorityClass = ProcessPriorityClass.High;
+
 			Application.ApplicationExit += new EventHandler(OnApplicationExit);
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
@@ -35,6 +39,8 @@ namespace MK2360
 			{
 				XMode.Stop(true);
 			}
+
+			XMode.BlockInput(false);
 		}
 	}
 }

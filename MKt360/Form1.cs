@@ -246,7 +246,7 @@ namespace MK2360
 			Controls.Add(b);
 			b.Location = new Point(10, 176);
 			b.Size = new Size(178, 174);
-			b.m_Label.Text = "Right bumper key: ";
+			b.m_Label.Text = "Right bumper: ";
 			b.m_Bind.Key = Preset.Current.m_BindList.RightBumper;
 
 			KeyPanelClass.CurrentPanel = b;
@@ -257,7 +257,7 @@ namespace MK2360
 			Controls.Add(b);
 			b.Location = new Point(10, 176);
 			b.Size = new Size(178, 174);
-			b.m_Label.Text = "Right trigger key: ";
+			b.m_Label.Text = "Right trigger: ";
 			b.m_Bind.Key = Preset.Current.m_BindList.RightTrigger;
 
 			KeyPanelClass.CurrentPanel = b;
@@ -268,7 +268,7 @@ namespace MK2360
 			Controls.Add(b);
 			b.Location = new Point(10, 176);
 			b.Size = new Size(178, 174);
-			b.m_Label.Text = "Left bumper key: ";
+			b.m_Label.Text = "Left bumper: ";
 			b.m_Bind.Key = Preset.Current.m_BindList.LeftBumper;
 
 			KeyPanelClass.CurrentPanel = b;
@@ -279,7 +279,7 @@ namespace MK2360
 			Controls.Add(b);
 			b.Location = new Point(10, 176);
 			b.Size = new Size(178, 174);
-			b.m_Label.Text = "Left trigger key: ";
+			b.m_Label.Text = "Left trigger: ";
 			b.m_Bind.Key = Preset.Current.m_BindList.LeftTrigger;
 
 			KeyPanelClass.CurrentPanel = b;
@@ -372,9 +372,6 @@ namespace MK2360
 		}
 		private void Intercept()
 		{
-			using (Process p = Process.GetCurrentProcess())
-				p.PriorityClass = ProcessPriorityClass.High;
-
 			IntPtr context = Interception.interception_create_context();
 			Interception.Stroke stroke = new Interception.Stroke();
 			int device;
@@ -473,7 +470,7 @@ namespace MK2360
 				if (p.MainWindowTitle.Length > 0)
 				{
 					ProcessItem pi = new ProcessItem();
-					pi.m_Display = p.MainWindowTitle;
+					pi.m_Display = p.MainWindowTitle.Trim();
 					pi.m_Process = p.ProcessName;
 					ProcessComboBox.Items.Add(pi);
 				}

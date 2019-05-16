@@ -11,6 +11,9 @@ namespace MK2360
 {
 	public class XMode
 	{
+		[DllImport("user32.dll", EntryPoint = "BlockInput")]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool BlockInput([MarshalAs(UnmanagedType.Bool)] bool fBlockIt);
 		/*
 		[DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
 		static extern bool CheckRemoteDebuggerPresent(IntPtr hProcess, ref bool isDebuggerPresent);
@@ -42,17 +45,20 @@ namespace MK2360
 			}
 			*/
 
-			if (m_Active == true){
+			if (m_Active == true)
+			{
 				Form1.Log("Controller mode is already active.");
 				return false;
 			}
 
-			if(Preset.Current == null){
+			if(Preset.Current == null)
+			{
 				Form1.Log("No active preset, can't start.");
 				return false;
 			}
 
-			if(Preset.Current.m_ProcessItem == null){
+			if(Preset.Current.m_ProcessItem == null)
+			{
 				Form1.Log("Can't start unless you specify a process.");
 				return false;
 			}
@@ -109,14 +115,7 @@ namespace MK2360
 				return Input.InputAction.Stop;
 			}
 
-			var active = GetActiveWindowTitle();
-
-			if(active == null)
-			{
-				return Input.InputAction.Continue;
-			}
-
-			if (active.Trim() != Preset.Current.m_ProcessItem.m_Display.Trim())
+			if(!bInputBlocked)
 			{
 				return Input.InputAction.Continue;
 			}
@@ -505,6 +504,8 @@ namespace MK2360
 			while (m_Past.Count > m_SampleCount)
 				m_Past.RemoveAt(0);
 		}
+
+		private static bool bInputBlocked = false;
 		private static void CheckMouse()
 		{
 			while(m_bStopThread == false)
@@ -534,6 +535,22 @@ namespace MK2360
 							m_Bus.Report(2, m_Ctrlr.GetReport());
 						}
 					}
+				}
+
+				var active = GetActiveWindowTitle();
+
+				if (active != null && active.Trim() == Preset.Current.m_ProcessItem.m_Display)
+				{
+					if(!bInputBlocked)
+					{
+						BlockInput(true);
+						bInputBlocked = true;
+					}
+				}
+				else if(bInputBlocked)
+				{
+					BlockInput(false);
+					bInputBlocked = false;
 				}
 
 				Thread.Sleep(2);

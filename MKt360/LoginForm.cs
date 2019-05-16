@@ -38,7 +38,7 @@ namespace MK2360
 
 		private string AttemptLogin(string username, string password)
 		{
-			webClient.Headers.Add("user-agent", "EasyEdit");
+			webClient.Headers.Add("user-agent", "MK2360");
 			webClient.QueryString.Add("email", username);
 			webClient.QueryString.Add("pass", password);
 
