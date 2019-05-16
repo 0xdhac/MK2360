@@ -137,6 +137,7 @@
     <Compile Include="LoginForm.Designer.cs">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Macros.cs" />
     <Compile Include="PasswordRecovery.cs">
       <SubType>Form</SubType>
     </Compile>

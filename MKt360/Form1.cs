@@ -18,6 +18,7 @@ namespace MK2360
 		{
 			MainForm = this;
 			InitializeComponent();
+			FormClosing += Form1_Closing;
 
 			// Check if program never ran or if the config doesn't exist somehow
 			if (!Config.Exists())
@@ -70,6 +71,7 @@ namespace MK2360
 				}
 			}
 
+			
 			Thread t = new Thread(Intercept);
 			t.IsBackground = true;
 			t.Start();
@@ -110,6 +112,11 @@ namespace MK2360
 			RBButton.Click += RBButton_Click;
 
 			ControllerModeButton.FlatStyle = FlatStyle.Flat;
+		}
+
+		private void Form1_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+			Application.Exit();
 		}
 
 		private void ControllerModeButton_Click(object sender, EventArgs e)

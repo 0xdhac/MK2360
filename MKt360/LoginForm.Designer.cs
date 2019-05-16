@@ -37,8 +37,6 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.PurchaseButton = new System.Windows.Forms.Button();
 			this.IForgotLabel = new System.Windows.Forms.LinkLabel();
-			this.IForgotPicture = new System.Windows.Forms.PictureBox();
-			((System.ComponentModel.ISupportInitialize)(this.IForgotPicture)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// LoginButton
@@ -54,7 +52,7 @@
 			// UsernameLabel
 			// 
 			this.UsernameLabel.AutoSize = true;
-			this.UsernameLabel.Location = new System.Drawing.Point(34, 8);
+			this.UsernameLabel.Location = new System.Drawing.Point(59, 9);
 			this.UsernameLabel.Name = "UsernameLabel";
 			this.UsernameLabel.Size = new System.Drawing.Size(38, 13);
 			this.UsernameLabel.TabIndex = 1;
@@ -63,7 +61,7 @@
 			// PasswordLabel
 			// 
 			this.PasswordLabel.AutoSize = true;
-			this.PasswordLabel.Location = new System.Drawing.Point(16, 34);
+			this.PasswordLabel.Location = new System.Drawing.Point(41, 35);
 			this.PasswordLabel.Name = "PasswordLabel";
 			this.PasswordLabel.Size = new System.Drawing.Size(56, 13);
 			this.PasswordLabel.TabIndex = 2;
@@ -71,14 +69,14 @@
 			// 
 			// UsernameTextbox
 			// 
-			this.UsernameTextbox.Location = new System.Drawing.Point(74, 5);
+			this.UsernameTextbox.Location = new System.Drawing.Point(99, 6);
 			this.UsernameTextbox.Name = "UsernameTextbox";
 			this.UsernameTextbox.Size = new System.Drawing.Size(100, 20);
 			this.UsernameTextbox.TabIndex = 3;
 			// 
 			// PasswordTextbox
 			// 
-			this.PasswordTextbox.Location = new System.Drawing.Point(74, 31);
+			this.PasswordTextbox.Location = new System.Drawing.Point(99, 32);
 			this.PasswordTextbox.Name = "PasswordTextbox";
 			this.PasswordTextbox.PasswordChar = '•';
 			this.PasswordTextbox.Size = new System.Drawing.Size(100, 20);
@@ -107,7 +105,7 @@
 			// IForgotLabel
 			// 
 			this.IForgotLabel.AutoSize = true;
-			this.IForgotLabel.Location = new System.Drawing.Point(180, 5);
+			this.IForgotLabel.Location = new System.Drawing.Point(180, 63);
 			this.IForgotLabel.Name = "IForgotLabel";
 			this.IForgotLabel.Size = new System.Drawing.Size(58, 13);
 			this.IForgotLabel.TabIndex = 8;
@@ -115,24 +113,12 @@
 			this.IForgotLabel.Text = "I FORGOT";
 			this.IForgotLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.IForgotLabel_LinkClicked);
 			// 
-			// IForgotPicture
-			// 
-			this.IForgotPicture.Image = ((System.Drawing.Image)(resources.GetObject("IForgotPicture.Image")));
-			this.IForgotPicture.Location = new System.Drawing.Point(177, 21);
-			this.IForgotPicture.Name = "IForgotPicture";
-			this.IForgotPicture.Size = new System.Drawing.Size(61, 54);
-			this.IForgotPicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-			this.IForgotPicture.TabIndex = 9;
-			this.IForgotPicture.TabStop = false;
-			this.IForgotPicture.Click += new System.EventHandler(this.IForgotPicture_Click);
-			// 
 			// LoginForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;
 			this.ClientSize = new System.Drawing.Size(250, 107);
-			this.Controls.Add(this.IForgotPicture);
 			this.Controls.Add(this.IForgotLabel);
 			this.Controls.Add(this.PurchaseButton);
 			this.Controls.Add(this.label1);
@@ -144,7 +130,6 @@
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "LoginForm";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			((System.ComponentModel.ISupportInitialize)(this.IForgotPicture)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -160,6 +145,5 @@
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Button PurchaseButton;
 		private System.Windows.Forms.LinkLabel IForgotLabel;
-		private System.Windows.Forms.PictureBox IForgotPicture;
 	}
 }

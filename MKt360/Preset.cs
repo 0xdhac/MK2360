@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using System.IO;
 using Nett;
+using System.Collections.Generic;
 
 namespace MK2360
 {
@@ -10,6 +11,7 @@ namespace MK2360
 		public string m_Name { get; set; }
 		public ProcessItem m_ProcessItem { get; set; }
 		public BindList m_BindList { get; set; } = new BindList();
+		//public List<Macro> m_Macros { get; set; }
 
 		public static string m_Path        = "presets";
 		public static string m_FileType    = "cfg";
@@ -18,7 +20,8 @@ namespace MK2360
 
 		public Preset()
 		{
-			m_BindList = new BindList();
+			//m_Macros = new List<Macro>();
+			//Macro.CreateMacros(this);
 		}
 
 		public static Preset Current
