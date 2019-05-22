@@ -97,7 +97,7 @@ namespace MK2360
 			IsChanged = true;
 		}
 
-		public bool HasKey(object code)
+		public bool HasCode(object code)
 		{
 			if(m_InputType == InputType.Keyboard)
 			{
@@ -105,7 +105,9 @@ namespace MK2360
 			}
 			else
 			{
-				return ((MouseInput)code & (MouseInput)Code) > 0;
+				int thisCode = (int)Enum.Parse(typeof(MouseInput), Code.ToString());
+				int objCode = (int)Enum.Parse(typeof(MouseInput), code.ToString());
+				return (thisCode & objCode) > 0;
 			}
 		}
 
@@ -198,7 +200,7 @@ namespace MK2360
 			WheelDown = 0x10,
 			Button4 = 0x20,
 			Button5 = 0x40,
-			Move = 0x50
+			Move = 0x80
 		}
 		public enum DIK
 		{
@@ -367,24 +369,24 @@ namespace MK2360
 			return hashCode;
 		}
 
-		public static bool operator ==(Key a, Input b)
+		public static bool operator ==(Key k, Input i)
 		{
-			return (a.m_InputType == b.m_InputType && a.Code.ToString() == b.Code.ToString());
+			return (k.m_InputType == i.m_InputType && i.HasCode(k.Code));
 		}
 
-		public static bool operator !=(Key a, Input b)
+		public static bool operator !=(Key k, Input i)
 		{
-			return !(a.m_InputType == b.m_InputType && a.Code.ToString() == b.Code.ToString());
+			return !(k.m_InputType == i.m_InputType && i.HasCode(k.Code));
 		}
 
-		public static bool operator ==(Input b, Key a)
+		public static bool operator ==(Input i, Key k)
 		{
-			return (a.m_InputType == b.m_InputType && a.Code.ToString() == b.Code.ToString());
+			return (k.m_InputType == i.m_InputType && i.HasCode(k.Code));
 		}
 
-		public static bool operator !=(Input b, Key a)
+		public static bool operator !=(Input i, Key k)
 		{
-			return !(a.m_InputType == b.m_InputType && a.Code.ToString() == b.Code.ToString());
+			return !(k.m_InputType == i.m_InputType && i.HasCode(k.Code));
 		}
 	}
 
