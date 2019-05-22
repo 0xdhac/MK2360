@@ -23,8 +23,8 @@ namespace MK2360
 		private static long m_LastElapsed		= 0;
 		private static Stopwatch m_Stopwatch	= new Stopwatch();
 		private static bool m_bStopThread		= false;
-		private static ScpBus m_Bus				= new ScpBus();
-		private static X360Controller m_Ctrlr	= new X360Controller();
+		public static ScpBus m_Bus				= new ScpBus();
+		public static X360Controller m_Ctrlr	= new X360Controller();
 		private static bool m_Active			= false;
 		private static Thread m_MouseThread;
 		public static bool Start()
@@ -81,7 +81,8 @@ namespace MK2360
 			return true;
 		}
 
-		public static void Stop(bool remove){
+		public static void Stop(bool remove)
+		{
 			Form1.MainForm.ShowPresetControls();
 			if(remove)
 				Input.RemoveKeyListener(OnKeyPress);
@@ -98,7 +99,8 @@ namespace MK2360
 			m_Active = false;
 		}
 
-		public static bool IsActive(){
+		public static bool IsActive()
+		{
 			return m_Active;
 		}
 

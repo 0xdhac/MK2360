@@ -6,11 +6,16 @@ namespace MK2360
 {
 	public class Input
 	{
+		public delegate InputAction KeyStateChangeCallback(Input key);
+		private static List<KeyStateChangeCallback> Listeners = new List<KeyStateChangeCallback>();
+		private static List<KeyStateChangeCallback> ToAdd = new List<KeyStateChangeCallback>();
+		private static List<KeyStateChangeCallback> ToRemove = new List<KeyStateChangeCallback>();
 		public static bool[] DIK_KeyState = new bool[Enum.GetNames(typeof(Input.DIK)).Length];
 		public static bool[] Mouse_KeyState = new bool[Enum.GetNames(typeof(Input.MouseInput)).Length];
 		public InputType m_InputType;
 		public InputState m_InputState;
 		public Interception.Stroke Stroke;
+		public bool IsChanged;
 		public object Code;
 
 		public Input(Interception.KeyStroke s)
@@ -22,11 +27,13 @@ namespace MK2360
 			if (s.state == (ushort)Interception.KeyState.KeyDown)
 			{
 				m_InputState = InputState.Down;
+				IsChanged = (DIK_KeyState[(int)Code] == false);
 				DIK_KeyState[(int)Code] = true;
 			}
 			else if (s.state == (ushort)Interception.KeyState.KeyUp)
 			{
 				m_InputState = InputState.Up;
+				IsChanged = (DIK_KeyState[(int)Code] == true);
 				DIK_KeyState[(int)Code] = false;
 			}
 			else
@@ -86,22 +93,42 @@ namespace MK2360
 			{
 				Code = MouseInput.Move;
 			}
+
+			IsChanged = true;
 		}
 
-		public delegate InputAction KeyStateChangeCallback(Input key);
-		private static List<KeyStateChangeCallback> Listeners = new List<KeyStateChangeCallback>();
+		public bool HasKey(object code)
+		{
+			if(m_InputType == InputType.Keyboard)
+			{
+				return code == Code;
+			}
+			else
+			{
+				return ((MouseInput)code & (MouseInput)Code) > 0;
+			}
+		}
+
 		public static void AddKeyListener(KeyStateChangeCallback func)
 		{
-			Listeners.Add(func);
+			ToAdd.Add(func);
 		}
+
 		public static void RemoveKeyListener(KeyStateChangeCallback func)
 		{
-			Listeners.Remove(func);
+			ToRemove.Add(func);
 		}
+
 		public InputAction CallKeyListeners()
 		{
+			if (ToAdd.Count > 0)
+			{
+				Listeners.AddRange(ToAdd);
+				ToAdd.Clear();
+			}
+
 			InputAction result = 0;
-			List<KeyStateChangeCallback> remove = new List<KeyStateChangeCallback>();
+			List<KeyStateChangeCallback> stoplist = new List<KeyStateChangeCallback>();
 			foreach(KeyStateChangeCallback k in Listeners)
 			{
 				InputAction funcResult = k(this);
@@ -109,11 +136,19 @@ namespace MK2360
 
 				if((funcResult & InputAction.Stop) > 0)
 				{
-					remove.Add(k);
+					stoplist.Add(k);
 				}
 			}
 
-			Listeners = Listeners.Except(remove).ToList();
+			if(stoplist.Count > 0)
+				Listeners = Listeners.Except(stoplist).ToList();
+
+			if(ToRemove.Count > 0)
+			{
+				Listeners = Listeners.Except(ToRemove).ToList();
+				ToRemove.Clear();
+			}
+				
 
 			return result;
 		}
@@ -156,14 +191,14 @@ namespace MK2360
 		public enum MouseInput
 		{
 			Invalid,
-			LeftMouse,
-			RightMouse,
-			MiddleMouse,
-			WheelUp,
-			WheelDown,
-			Button4,
-			Button5,
-			Move
+			LeftMouse = 0x01,
+			RightMouse = 0x02,
+			MiddleMouse = 0x04,
+			WheelUp = 0x08,
+			WheelDown = 0x10,
+			Button4 = 0x20,
+			Button5 = 0x40,
+			Move = 0x50
 		}
 		public enum DIK
 		{

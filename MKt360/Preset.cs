@@ -11,6 +11,9 @@ namespace MK2360
 		public string m_Name { get; set; }
 		public ProcessItem m_ProcessItem { get; set; }
 		public BindList m_BindList { get; set; } = new BindList();
+		public Dictionary<
+			string, 
+			Dictionary<string, string>> m_ScriptSettings { get; set; } = new Dictionary<string, Dictionary<string, string>>();
 		//public List<Macro> m_Macros { get; set; }
 
 		public static string m_Path        = "presets";
@@ -20,8 +23,7 @@ namespace MK2360
 
 		public Preset()
 		{
-			//m_Macros = new List<Macro>();
-			//Macro.CreateMacros(this);
+			CheckDirectory();
 		}
 
 		public static Preset Current
@@ -56,8 +58,35 @@ namespace MK2360
 			}
 		}
 
+		public bool AddSetting(string script, string key, string val)
+		{
+			// If there is no dictionary for the this script, create one
+			if (!m_ScriptSettings.ContainsKey(script))
+				m_ScriptSettings.Add(script, new Dictionary<string, string>());
+
+			// If the setting doesn't exist, add it
+			Dictionary<string, string> scriptDictionary;
+			if (!m_ScriptSettings.TryGetValue(script, out scriptDictionary))
+				return false;
+
+			if (!scriptDictionary.ContainsKey(key))
+				scriptDictionary.Add(key, val);
+
+			return true;
+		}
+
+		public static void CheckDirectory()
+		{
+			if (!Directory.Exists(m_Path))
+			{
+				Directory.CreateDirectory(m_Path);
+			}
+		}
+
 		public static string GetNextAvailableName()
 		{
+			CheckDirectory();
+
 			int count = 0;
 			while (File.Exists(m_Path + "/" + m_DefaultName + ++count + "." + m_FileType));
 
@@ -66,6 +95,8 @@ namespace MK2360
 
 		public static bool Rename(Preset preset, string name)
 		{
+			CheckDirectory();
+
 			try
 			{
 				File.Delete(m_Path + "/" + preset.m_Name + "." + m_FileType);
@@ -83,6 +114,8 @@ namespace MK2360
 
 		public static int GetCount()
 		{
+			CheckDirectory();
+
 			try
 			{
 				string[] files = Directory.GetFiles(m_Path + "/", "*." + m_FileType, SearchOption.TopDirectoryOnly);
@@ -97,6 +130,8 @@ namespace MK2360
 
 		public static Preset GetFirst()
 		{
+			CheckDirectory();
+
 			string[] files = Directory.GetFiles(m_Path + "/", "*." + m_FileType, SearchOption.TopDirectoryOnly);
 			if (files.GetLength(0) > 0)
 			{
@@ -117,11 +152,15 @@ namespace MK2360
 
 		public static bool Exists(string preset)
 		{
+			CheckDirectory();
+
 			return File.Exists(m_Path + "/" + preset + "." + m_FileType);
 		}
 
 		public static Preset Get(string preset)
 		{
+			CheckDirectory();
+
 			try
 			{
 				Preset p = Toml.ReadFile<Preset>(m_Path + "/" + preset + "." + m_FileType);
@@ -136,12 +175,16 @@ namespace MK2360
 
 		public void Save()
 		{
+			CheckDirectory();
+
 			Toml.WriteFile(this, m_Path + "/" + m_Name + "." + m_FileType);
 			Form1.Log("Saved preset '" + m_Name + "'.");
 		}
 
 		public void Delete()
 		{
+			CheckDirectory();
+
 			File.Delete(m_Path + "/" + m_Name + "." + m_FileType);
 
 			// If this preset is the current preset, change the current preset to another preset if there is another available one

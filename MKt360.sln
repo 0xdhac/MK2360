@@ -8,11 +8,17 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		DebugNoVerify|Any CPU = DebugNoVerify|Any CPU
+		NoVerify|Any CPU = NoVerify|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{24F57469-223E-4247-8873-EB60232D5398}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{24F57469-223E-4247-8873-EB60232D5398}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24F57469-223E-4247-8873-EB60232D5398}.DebugNoVerify|Any CPU.ActiveCfg = DebugNoVerify|Any CPU
+		{24F57469-223E-4247-8873-EB60232D5398}.DebugNoVerify|Any CPU.Build.0 = DebugNoVerify|Any CPU
+		{24F57469-223E-4247-8873-EB60232D5398}.NoVerify|Any CPU.ActiveCfg = NoVerify|Any CPU
+		{24F57469-223E-4247-8873-EB60232D5398}.NoVerify|Any CPU.Build.0 = NoVerify|Any CPU
 		{24F57469-223E-4247-8873-EB60232D5398}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24F57469-223E-4247-8873-EB60232D5398}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection

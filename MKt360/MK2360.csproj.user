@@ -2,10 +2,10 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectView>ShowAllFiles</ProjectView>
-    <PublishUrlHistory>publish\</PublishUrlHistory>
-    <InstallUrlHistory />
+    <PublishUrlHistory>C:\Program Files\MK2360\|ftp://hosted28.nfoservers.com/public/download/MK2360/|C:\Program Files\|ftp://hosted28.nfoservers.com/|C:\publish\</PublishUrlHistory>
+    <InstallUrlHistory>http://www.oxdmacro.site.nfoservers.com/download/MK2360/|http:\\oxdmacro.site.nfoservers.com/download/MK2360/|http:\\oxdmacro.site.nfoservers.com/download/|\\localhost\publish\</InstallUrlHistory>
     <SupportUrlHistory />
-    <UpdateUrlHistory />
+    <UpdateUrlHistory>http://oxdmacro.site.nfoservers.com/download/MK2360/</UpdateUrlHistory>
     <BootstrapperUrlHistory />
     <ErrorReportUrlHistory />
     <FallbackCulture>en-US</FallbackCulture>

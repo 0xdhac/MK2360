@@ -8,6 +8,7 @@ using System.Diagnostics;
 using Nett;
 using System.Runtime.InteropServices;
 using NLog;
+using System.Text;
 
 namespace MK2360
 {
@@ -16,10 +17,11 @@ namespace MK2360
 		public static Form1 MainForm;
 		public Form1()
 		{
+			
 			MainForm = this;
 			InitializeComponent();
 			FormClosing += Form1_Closing;
-
+			
 			// Check if program never ran or if the config doesn't exist somehow
 			if (!Config.Exists())
 			{
@@ -71,7 +73,10 @@ namespace MK2360
 				}
 			}
 
-			
+			Thread u = new Thread(Scripts);
+			u.IsBackground = true;
+			u.Start();
+
 			Thread t = new Thread(Intercept);
 			t.IsBackground = true;
 			t.Start();
@@ -112,6 +117,42 @@ namespace MK2360
 			RBButton.Click += RBButton_Click;
 
 			ControllerModeButton.FlatStyle = FlatStyle.Flat;
+
+#if !NOVERIFY
+			Thread v = new Thread(ValidateSelfThread);
+			v.IsBackground = true;
+			v.Start();
+#endif
+		}
+
+		private void Scripts()
+		{
+			new Script("holdtoedit");
+			new Script("wallreplace");
+		}
+
+		private void ValidateSelfThread()
+		{
+			while(true)
+			{
+				if (ValidateSelf() != "SUCCESS")
+				{
+					Application.Exit();
+				}
+
+				Thread.Sleep(300000);
+			}
+		}
+
+		private static string ValidateSelf()
+		{
+			string validateUrl = "http://oxdmacro.site.nfoservers.com/validate.php";
+			string sHash = Program.GetExecutingFileHash();
+
+			LoginForm.webClient.QueryString.Clear();
+			LoginForm.webClient.QueryString.Add("hash", sHash);
+			var data = LoginForm.webClient.UploadValues(validateUrl, "POST", LoginForm.webClient.QueryString);
+			return Encoding.UTF8.GetString(data);
 		}
 
 		private void Form1_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -398,19 +439,34 @@ namespace MK2360
 				{
 					Interception.KeyStroke kstroke = stroke;
 					Input i = new Input(kstroke);
-					Input.InputAction act = i.CallKeyListeners();
+					if(i.IsChanged)
+					{
+						Input.InputAction act = i.CallKeyListeners();
 
-					if ((act & Input.InputAction.Block) == 0)
+						if ((act & Input.InputAction.Block) == 0)
+							Interception.interception_send(context, device, strokeBytes, 1);
+					}
+					else
+					{
 						Interception.interception_send(context, device, strokeBytes, 1);
+					}
 				}
 				else if (Interception.interception_is_mouse(device) != 0)
 				{
 					Interception.MouseStroke kstroke = stroke;
 					Input i = new Input(kstroke);
-					Input.InputAction act = i.CallKeyListeners();
 
-					if ((act & Input.InputAction.Block) == 0)
+					if (i.IsChanged)
+					{
+						Input.InputAction act = i.CallKeyListeners();
+
+						if ((act & Input.InputAction.Block) == 0)
+							Interception.interception_send(context, device, strokeBytes, 1);
+					}
+					else
+					{
 						Interception.interception_send(context, device, strokeBytes, 1);
+					}
 				}
 			}
 
@@ -565,6 +621,11 @@ namespace MK2360
 			{
 				return Input.InputAction.Continue;
 			}
+		}
+
+		private void MacrosButton_Click(object sender, EventArgs e)
+		{
+			new MacroForm().ShowDialog();
 		}
 	}
 

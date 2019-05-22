@@ -57,6 +57,7 @@
 			this.YButton = new MK2360.OvalPictureBox();
 			this.AButton = new MK2360.OvalPictureBox();
 			this.DpadButton = new MK2360.OvalPictureBox();
+			this.MacrosButton = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.RTButton)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.RBButton)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.LTButton)).BeginInit();
@@ -373,12 +374,23 @@
 			this.DpadButton.TabIndex = 2;
 			this.DpadButton.TabStop = false;
 			// 
+			// MacrosButton
+			// 
+			this.MacrosButton.Location = new System.Drawing.Point(10, 327);
+			this.MacrosButton.Name = "MacrosButton";
+			this.MacrosButton.Size = new System.Drawing.Size(178, 23);
+			this.MacrosButton.TabIndex = 31;
+			this.MacrosButton.Text = "Macros";
+			this.MacrosButton.UseVisualStyleBackColor = true;
+			this.MacrosButton.Click += new System.EventHandler(this.MacrosButton_Click);
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.Color.WhiteSmoke;
 			this.ClientSize = new System.Drawing.Size(880, 526);
+			this.Controls.Add(this.MacrosButton);
 			this.Controls.Add(this.PresetNameTextbox);
 			this.Controls.Add(this.PresetNameLabel);
 			this.Controls.Add(this.KillSwitchTextBox);
@@ -460,6 +472,7 @@
 		private System.Windows.Forms.Label PresetNameLabel;
 		public System.Windows.Forms.TextBox PresetNameTextbox;
 		public System.Windows.Forms.Button ControllerModeButton;
+		private System.Windows.Forms.Button MacrosButton;
 	}
 }
 
