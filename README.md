@@ -5,7 +5,7 @@ The MK2360 program is a tool that allows anyone running Windows to emulate an Xb
 [Here is the download link to the most recent version.][Download]
 
 # Gaining access
-* To gain access to use the program, you need to purchase it. To do that, you should run the program and click **Purchase**. The current payment methods I accept are Bitcoin and Paypal. And the current price is $5 USD.
+* It's free now. Currently you have to compile it to get it.
 
 # How to set up
 * Make sure you have a recent version of [.NET Framework].
