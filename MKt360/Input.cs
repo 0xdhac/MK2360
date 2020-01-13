@@ -10,35 +10,35 @@ namespace MK2360
 		private static List<KeyStateChangeCallback> Listeners = new List<KeyStateChangeCallback>();
 		private static List<KeyStateChangeCallback> ToAdd = new List<KeyStateChangeCallback>();
 		private static List<KeyStateChangeCallback> ToRemove = new List<KeyStateChangeCallback>();
-		public static bool[] DIK_KeyState = new bool[Enum.GetNames(typeof(Input.DIK)).Length];
-		public static bool[] Mouse_KeyState = new bool[Enum.GetNames(typeof(Input.MouseInput)).Length];
+		public static bool[] DIK_KeyState = new bool[Enum.GetNames(typeof(DIK)).Length];
+		public static int Mouse_KeyState = 0;
 		public InputType m_InputType;
-		public InputState m_InputState;
+		public List<InputState> m_InputState = new List<InputState>();
 		public Interception.Stroke Stroke;
-		public bool IsChanged;
-		public object Code;
+		public List<bool> IsChanged = new List<bool>();
+		public List<ushort> Code = new List<ushort>();
 
 		public Input(Interception.KeyStroke s)
 		{
 			m_InputType = InputType.Keyboard;
 			Stroke     = s;
-			Code = (DIK)(s.code);
+			Code.Add(s.code);
 
 			if (s.state == (ushort)Interception.KeyState.KeyDown)
 			{
-				m_InputState = InputState.Down;
-				IsChanged = (DIK_KeyState[(int)Code] == false);
-				DIK_KeyState[(int)Code] = true;
+				m_InputState.Add(InputState.Down);
+				IsChanged.Add(DIK_KeyState[s.code] == false);
+				DIK_KeyState[s.code] = true;
 			}
 			else if (s.state == (ushort)Interception.KeyState.KeyUp)
 			{
-				m_InputState = InputState.Up;
-				IsChanged = (DIK_KeyState[(int)Code] == true);
-				DIK_KeyState[(int)Code] = false;
+				m_InputState.Add(InputState.Up);
+				IsChanged.Add(DIK_KeyState[s.code] == true);
+				DIK_KeyState[s.code] = false;
 			}
 			else
 			{
-				m_InputState = InputState.Invalid;
+				m_InputState.Add(InputState.Invalid);
 			}	
 		}
 		public Input(Interception.MouseStroke s)
@@ -46,69 +46,72 @@ namespace MK2360
 			m_InputType = InputType.Mouse;
 			Stroke  = s;
 
-			if (s.state == (ushort)Interception.MouseState.LeftDown || s.state == (ushort)Interception.MouseState.LeftUp)
+			if ((s.state & (ushort)Interception.MouseState.LeftDown) > 0 || (s.state & (ushort)Interception.MouseState.LeftUp) > 0)
 			{
-				Code = MouseInput.LeftMouse;
-				m_InputState = (s.state == (ushort)Interception.MouseState.LeftDown) ? InputState.Down : InputState.Up;
-				Mouse_KeyState[(int)Code] = (m_InputState == InputState.Down) ? true : false;
+				Code.Add((ushort)MouseInput.LeftMouse);
+				InputState inputstate = (s.state == ((ushort)Interception.MouseState.LeftDown) ? InputState.Down : InputState.Up);
+				m_InputState.Add(inputstate);
+				Mouse_KeyState = (inputstate == InputState.Down) ? Mouse_KeyState | (ushort)MouseInput.LeftMouse : Mouse_KeyState & ~(ushort)MouseInput.LeftMouse;
+				IsChanged.Add(true);
 			}
-			else if (s.state == (ushort)Interception.MouseState.RightDown || s.state == (ushort)Interception.MouseState.RightUp)
+
+			if ((s.state & (ushort)Interception.MouseState.RightDown) > 0 || (s.state & (ushort)Interception.MouseState.RightUp) > 0)
 			{
-				Code = MouseInput.RightMouse;
-				m_InputState = (s.state == (ushort)Interception.MouseState.RightDown) ? InputState.Down : InputState.Up;
-				Mouse_KeyState[(int)Code] = (m_InputState == InputState.Down) ? true : false;
+				Code.Add((ushort)MouseInput.RightMouse);
+				InputState inputstate = (s.state == ((ushort)Interception.MouseState.RightDown) ? InputState.Down : InputState.Up);
+				m_InputState.Add(inputstate);
+				Mouse_KeyState = (inputstate == InputState.Down) ? Mouse_KeyState | (ushort)MouseInput.RightMouse : Mouse_KeyState & ~(ushort)MouseInput.RightMouse;
+				IsChanged.Add(true);
 			}
-			else if (s.state == (ushort)Interception.MouseState.MiddleDown || s.state == (ushort)Interception.MouseState.MiddleUp)
+			if ((s.state & (ushort)Interception.MouseState.MiddleDown) > 0 || (s.state & (ushort)Interception.MouseState.MiddleUp) > 0)
 			{
-				Code = MouseInput.MiddleMouse;
-				m_InputState = (s.state == (ushort)Interception.MouseState.MiddleDown) ? InputState.Down : InputState.Up;
-				Mouse_KeyState[(int)Code] = (m_InputState == InputState.Down) ? true : false;
+				Code.Add((ushort)MouseInput.MiddleMouse);
+				InputState inputstate = (s.state == ((ushort)Interception.MouseState.MiddleDown) ? InputState.Down : InputState.Up);
+				m_InputState.Add(inputstate);
+				Mouse_KeyState = (inputstate == InputState.Down) ? Mouse_KeyState | (ushort)MouseInput.MiddleMouse : Mouse_KeyState & ~(ushort)MouseInput.MiddleMouse;
+				IsChanged.Add(true);
 			}
-			else if (s.state == (ushort)Interception.MouseState.Button4Down || s.state == (ushort)Interception.MouseState.Button4Up)
+			if ((s.state & (ushort)Interception.MouseState.Button4Down) > 0 || (s.state & (ushort)Interception.MouseState.Button4Up) > 0)
 			{
-				Code = MouseInput.Button4;
-				m_InputState = (s.state == (ushort)Interception.MouseState.Button4Down) ? InputState.Down : InputState.Up;
-				Mouse_KeyState[(int)Code] = (m_InputState == InputState.Down) ? true : false;
+				Code.Add((ushort)MouseInput.Button4);
+				InputState inputstate = (s.state == ((ushort)Interception.MouseState.Button4Down) ? InputState.Down : InputState.Up);
+				m_InputState.Add(inputstate);
+				Mouse_KeyState = (inputstate == InputState.Down) ? Mouse_KeyState | (ushort)MouseInput.Button4 : Mouse_KeyState & ~(ushort)MouseInput.Button4;
+				IsChanged.Add(true);
 			}
-			else if (s.state == (ushort)Interception.MouseState.Button5Down || s.state == (ushort)Interception.MouseState.Button5Up)
+			if ((s.state & (ushort)Interception.MouseState.Button5Down) > 0 || (s.state & (ushort)Interception.MouseState.Button5Up) > 0)
 			{
-				Code = MouseInput.Button5;
-				m_InputState = (s.state == (ushort)Interception.MouseState.Button5Down) ? InputState.Down : InputState.Up;
-				Mouse_KeyState[(int)Code] = (m_InputState == InputState.Down) ? true : false;
+				Code.Add((ushort)MouseInput.Button5);
+				InputState inputstate = (s.state == ((ushort)Interception.MouseState.Button5Down) ? InputState.Down : InputState.Up);
+				m_InputState.Add(inputstate);
+				Mouse_KeyState = (inputstate == InputState.Down) ? Mouse_KeyState | (ushort)MouseInput.Button5 : Mouse_KeyState & ~(ushort)MouseInput.Button5;
+				IsChanged.Add(true);
 			}
-			else if (s.state == (ushort)Interception.MouseState.MouseWheel || s.state == (ushort)Interception.MouseState.MouseHWheel)
+			if ((s.state & (ushort)Interception.MouseState.MouseWheel) > 0 || (s.state & (ushort)Interception.MouseState.MouseHWheel) > 0)
 			{
 				if (s.rolling > 0)
 				{
-					Code = MouseInput.WheelUp;
+					Code.Add((ushort)MouseInput.WheelUp);
 				}
 				else
 				{
-					Code = MouseInput.WheelDown;
+					Code.Add((ushort)MouseInput.WheelDown);
 				}
 
-				m_InputState = InputState.Impulse;
+				m_InputState.Add(InputState.Impulse);
+				IsChanged.Add(true);
 			}
-			else
+			
+			if(s.x != 0 || s.y != 0)
 			{
-				Code = MouseInput.Move;
+				Code.Add((ushort)MouseInput.Move);
+				IsChanged.Add(true);
 			}
-
-			IsChanged = true;
 		}
 
-		public bool HasCode(object code)
+		public bool HasCode(ushort code)
 		{
-			if(m_InputType == InputType.Keyboard)
-			{
-				return code == Code;
-			}
-			else
-			{
-				int thisCode = (int)Enum.Parse(typeof(MouseInput), Code.ToString());
-				int objCode = (int)Enum.Parse(typeof(MouseInput), code.ToString());
-				return (thisCode & objCode) > 0;
-			}
+			return Code.Contains(code);
 		}
 
 		public static void AddKeyListener(KeyStateChangeCallback func)
@@ -159,13 +162,11 @@ namespace MK2360
 		{
 			if (k.m_InputType == InputType.Keyboard)
 			{
-				int idx = (int)Enum.Parse(typeof(DIK), k.Code.ToString());
-				return DIK_KeyState[idx];
+				return DIK_KeyState[k.Code];
 			}
 			else if(k.m_InputType == InputType.Mouse)
 			{
-				int idx = (int)Enum.Parse(typeof(MouseInput), k.Code.ToString());
-				return Mouse_KeyState[idx];
+				return (Mouse_KeyState & k.Code) > 0;
 			}
 
 			Form1.Log("Input.cs GetKeyState - Shouldn't see this msg");
@@ -329,29 +330,47 @@ namespace MK2360
 			Power,
 			Sleep
 		}
-
-		public override string ToString()
-		{
-			return Code.ToString();
-		}
 	}
 
 	public class Key
 	{
 		public Input.InputType m_InputType { get; set; }
-		public object Code { get; set; }
+		public ushort Code { get; set; }
 
 		public Key() { }
 
-		public Key(Input.InputType m_InputType, object code)
+		public Key(Input.InputType m_InputType, ushort code)
 		{
 			this.m_InputType = m_InputType;
 			Code = code;
 		}
 
+		public Key(string k)
+		{
+			Input.DIK kCode;
+			Input.MouseInput mCode;
+			if (Enum.TryParse(k, out kCode))
+			{
+				m_InputType = Input.InputType.Keyboard;
+				Code = (ushort)kCode;
+			}
+			else if (Enum.TryParse(k, out mCode))
+			{
+				m_InputType = Input.InputType.Mouse;
+				Code = (ushort)mCode;
+			}
+			else
+			{
+				Form1.Log("Invalid key code: " + k);
+			}
+		}
+
 		public override string ToString()
 		{
-			return Code.ToString();
+			if (m_InputType == Input.InputType.Keyboard)
+				return ((Input.DIK)Code).ToString();
+			else
+				return ((Input.MouseInput)Code).ToString();
 		}
 
 		public override bool Equals(object obj)
@@ -392,33 +411,33 @@ namespace MK2360
 
 	public class BindList
 	{
-		public Key StartButton { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
-		public Key BackButton { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
-		public Key YButton { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
-		public Key XButton { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
-		public Key AButton { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Space);
-		public Key BButton { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
-		public Key RightJoyPress { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
+		public Key StartButton { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.Invalid);
+		public Key BackButton { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.Invalid);
+		public Key YButton { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.Invalid);
+		public Key XButton { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.Invalid);
+		public Key AButton { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.Space);
+		public Key BButton { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.Invalid);
+		public Key RightJoyPress { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.Invalid);
 		public Input.InputType RightJoyType { get; set; } = Input.InputType.Mouse;
-		public Key RightJoyMove { get; set; } = new Key(Input.InputType.Mouse, Input.MouseInput.Move);
-		public Key RightJoyUp { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.W);
-		public Key RightJoyDown { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.S);
-		public Key RightJoyRight { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.D);
-		public Key RightJoyLeft { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.A);
-		public Key LeftJoyPress { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
+		public Key RightJoyMove { get; set; } = new Key(Input.InputType.Mouse, (ushort)Input.MouseInput.Move);
+		public Key RightJoyUp { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.W);
+		public Key RightJoyDown { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.S);
+		public Key RightJoyRight { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.D);
+		public Key RightJoyLeft { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.A);
+		public Key LeftJoyPress { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.Invalid);
 		public Input.InputType LeftJoyType { get; set; } = Input.InputType.Keyboard;
-		public Key LeftJoyMove { get; set; } = new Key(Input.InputType.Mouse, Input.MouseInput.Move);
-		public Key LeftJoyUp { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.W);
-		public Key LeftJoyDown { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.S);
-		public Key LeftJoyRight { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.D);
-		public Key LeftJoyLeft { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.A);
-		public Key DPadUp { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
-		public Key DPadDown { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
-		public Key DPadRight { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
-		public Key DPadLeft { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
-		public Key LeftTrigger { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
-		public Key LeftBumper { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
-		public Key RightTrigger { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
-		public Key RightBumper { get; set; } = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
+		public Key LeftJoyMove { get; set; } = new Key(Input.InputType.Mouse, (ushort)Input.MouseInput.Move);
+		public Key LeftJoyUp { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.W);
+		public Key LeftJoyDown { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.S);
+		public Key LeftJoyRight { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.D);
+		public Key LeftJoyLeft { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.A);
+		public Key DPadUp { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.Invalid);
+		public Key DPadDown { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.Invalid);
+		public Key DPadRight { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.Invalid);
+		public Key DPadLeft { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.Invalid);
+		public Key LeftTrigger { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.Invalid);
+		public Key LeftBumper { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.Invalid);
+		public Key RightTrigger { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.Invalid);
+		public Key RightBumper { get; set; } = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.Invalid);
 	}
 }

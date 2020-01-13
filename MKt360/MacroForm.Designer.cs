@@ -92,7 +92,7 @@
 			// 
 			// SettingsPanel
 			// 
-			this.SettingsPanel.BackColor = System.Drawing.SystemColors.ActiveBorder;
+			this.SettingsPanel.BackColor = System.Drawing.SystemColors.Control;
 			this.SettingsPanel.Location = new System.Drawing.Point(4, 3);
 			this.SettingsPanel.Name = "SettingsPanel";
 			this.SettingsPanel.Size = new System.Drawing.Size(247, 283);

@@ -188,9 +188,9 @@
 			this.KillSwitchKey.Font = new System.Drawing.Font("Nirmala UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.KillSwitchKey.Location = new System.Drawing.Point(7, 96);
 			this.KillSwitchKey.Name = "KillSwitchKey";
-			this.KillSwitchKey.Size = new System.Drawing.Size(62, 13);
+			this.KillSwitchKey.Size = new System.Drawing.Size(44, 13);
 			this.KillSwitchKey.TabIndex = 27;
-			this.KillSwitchKey.Text = "Kill Switch:";
+			this.KillSwitchKey.Text = "Toggle:";
 			// 
 			// KillSwitchTextBox
 			// 
@@ -376,6 +376,7 @@
 			// 
 			// MacrosButton
 			// 
+			this.MacrosButton.Font = new System.Drawing.Font("Nirmala UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.MacrosButton.Location = new System.Drawing.Point(10, 327);
 			this.MacrosButton.Name = "MacrosButton";
 			this.MacrosButton.Size = new System.Drawing.Size(178, 23);

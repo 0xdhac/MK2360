@@ -14,10 +14,7 @@ namespace MK2360
 		[DllImport("user32.dll", EntryPoint = "BlockInput")]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool BlockInput([MarshalAs(UnmanagedType.Bool)] bool fBlockIt);
-		/*
-		[DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
-		static extern bool CheckRemoteDebuggerPresent(IntPtr hProcess, ref bool isDebuggerPresent);
-		*/
+
 		private const int m_SampleCount			= 3;
 		private static List<Pair> m_Past		= new List<Pair>();
 		private static long m_LastElapsed		= 0;
@@ -27,24 +24,9 @@ namespace MK2360
 		public static X360Controller m_Ctrlr	= new X360Controller();
 		private static bool m_Active			= false;
 		private static Thread m_MouseThread;
+		private static List<string> m_DisabledButtons = new List<string>();
 		public static bool Start()
 		{
-			/*
-			bool isDebuggerPresent = false;
-			CheckRemoteDebuggerPresent(Process.GetCurrentProcess().Handle, ref isDebuggerPresent);
-
-			if (isDebuggerPresent)
-			{
-				return false;
-			}
-
-			int unixTimestamp = (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-			if (unixTimestamp - 1557732990 > 604800)
-			{
-				return false;
-			}
-			*/
-
 			if (m_Active == true)
 			{
 				Form1.Log("Controller mode is already active.");
@@ -104,6 +86,18 @@ namespace MK2360
 			return m_Active;
 		}
 
+		public static void DisableOriginalBind(string button)
+		{
+			if (!m_DisabledButtons.Contains(button))
+				m_DisabledButtons.Add(button);
+		}
+
+		public static void EnableOriginalBind(string button)
+		{
+			if (m_DisabledButtons.Contains(button))
+				m_DisabledButtons.Remove(button);
+		}
+
 		private static Input.InputAction OnKeyPress(Input i)
 		{
 			if (m_Active == false)
@@ -111,20 +105,14 @@ namespace MK2360
 				return Input.InputAction.Continue;
 			}
 
-			if(i.m_InputType == Input.InputType.Keyboard && Config.m_Config.m_KillSwitch == (Input.DIK)i.Code)
-			{
-				Stop(false);
-				return Input.InputAction.Stop;
-			}
-
 			if(!bInputBlocked)
 			{
 				return Input.InputAction.Continue;
 			}
 
-			if (i.m_InputState == Input.InputState.Invalid)
+			if(!i.IsChanged.Contains(true))
 			{
-				return Input.InputAction.Continue;
+				return Input.InputAction.Block;
 			}
 
 			ConvertTo360(i);
@@ -137,328 +125,357 @@ namespace MK2360
 			BindList b = Preset.Current.m_BindList;
 			bool bPastUpdated = false;
 
-			if(i == b.AButton){
-				if(i.m_InputState == Input.InputState.Down){
-					m_Ctrlr.Buttons |= X360Buttons.A;
-				}
-				else if(i.m_InputState == Input.InputState.Up){
-					m_Ctrlr.Buttons &= ~X360Buttons.A;
-				}
-				else if(i.m_InputState == Input.InputState.Impulse){
-					m_Ctrlr.Buttons |= X360Buttons.A;
-					ImpulseRelease(X360Buttons.A);
-				}
-			}
-			if(i == b.XButton)
+			for(int idx = 0; idx < i.m_InputState.Count; idx++)
 			{
-				if (i.m_InputState == Input.InputState.Down)
+				if (!m_DisabledButtons.Contains("A") && i.m_InputType == b.AButton.m_InputType && i.Code[idx] == b.AButton.Code)
 				{
-					m_Ctrlr.Buttons |= X360Buttons.X;
-				}
-				else if (i.m_InputState == Input.InputState.Up)
-				{
-					m_Ctrlr.Buttons &= ~X360Buttons.X;
-				}
-				else if (i.m_InputState == Input.InputState.Impulse)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.X;
-					ImpulseRelease(X360Buttons.X);
-				}
-			}
-			if (i == b.YButton)
-			{
-				if (i.m_InputState == Input.InputState.Down)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.Y;
-				}
-				else if (i.m_InputState == Input.InputState.Up)
-				{
-					m_Ctrlr.Buttons &= ~X360Buttons.Y;
-				}
-				else if (i.m_InputState == Input.InputState.Impulse)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.Y;
-					ImpulseRelease(X360Buttons.Y);
-				}
-			}
-			if (i == b.BButton)
-			{
-				if (i.m_InputState == Input.InputState.Down)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.B;
-				}
-				else if (i.m_InputState == Input.InputState.Up)
-				{
-					m_Ctrlr.Buttons &= ~X360Buttons.B;
-				}
-				else if (i.m_InputState == Input.InputState.Impulse)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.B;
-					ImpulseRelease(X360Buttons.B);
-				}
-			}
-			if (i == b.StartButton)
-			{
-				if (i.m_InputState == Input.InputState.Down)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.Start;
-				}
-				else if (i.m_InputState == Input.InputState.Up)
-				{
-					m_Ctrlr.Buttons &= ~X360Buttons.Start;
-				}
-				else if (i.m_InputState == Input.InputState.Impulse)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.Start;
-					ImpulseRelease(X360Buttons.Start);
-				}
-			}
-			if (i == b.BackButton)
-			{
-				if (i.m_InputState == Input.InputState.Down)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.Back;
-				}
-				else if (i.m_InputState == Input.InputState.Up)
-				{
-					m_Ctrlr.Buttons &= ~X360Buttons.Back;
-				}
-				else if (i.m_InputState == Input.InputState.Impulse)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.Back;
-					ImpulseRelease(X360Buttons.Back);
-				}
-			}
-			if (i == b.DPadUp)
-			{
-				if (i.m_InputState == Input.InputState.Down)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.Up;
-				}
-				else if (i.m_InputState == Input.InputState.Up)
-				{
-					m_Ctrlr.Buttons &= ~X360Buttons.Up;
-				}
-				else if (i.m_InputState == Input.InputState.Impulse)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.Up;
-					ImpulseRelease(X360Buttons.Up);
-				}
-			}
-			if (i == b.DPadDown)
-			{
-				if (i.m_InputState == Input.InputState.Down)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.Down;
-				}
-				else if (i.m_InputState == Input.InputState.Up)
-				{
-					m_Ctrlr.Buttons &= ~X360Buttons.Down;
-				}
-				else if (i.m_InputState == Input.InputState.Impulse)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.Down;
-					ImpulseRelease(X360Buttons.Down);
-				}
-			}
-			if (i == b.DPadRight)
-			{
-				if (i.m_InputState == Input.InputState.Down)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.Right;
-				}
-				else if (i.m_InputState == Input.InputState.Up)
-				{
-					m_Ctrlr.Buttons &= ~X360Buttons.Right;
-				}
-				else if (i.m_InputState == Input.InputState.Impulse)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.Right;
-					ImpulseRelease(X360Buttons.Right);
-				}
-			}
-			if (i == b.DPadLeft)
-			{
-				if (i.m_InputState == Input.InputState.Down)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.Left;
-				}
-				else if (i.m_InputState == Input.InputState.Up)
-				{
-					m_Ctrlr.Buttons &= ~X360Buttons.Left;
-				}
-				else if (i.m_InputState == Input.InputState.Impulse)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.Left;
-					ImpulseRelease(X360Buttons.Left);
-				}
-			}
-			if (i == b.LeftBumper)
-			{
-				if (i.m_InputState == Input.InputState.Down)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.LeftBumper;
-				}
-				else if (i.m_InputState == Input.InputState.Up)
-				{
-					m_Ctrlr.Buttons &= ~X360Buttons.LeftBumper;
-				}
-				else if (i.m_InputState == Input.InputState.Impulse)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.LeftBumper;
-					ImpulseRelease(X360Buttons.LeftBumper);
-				}
-			}
-			if (i == b.RightBumper)
-			{
-				if (i.m_InputState == Input.InputState.Down)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.RightBumper;
-				}
-				else if (i.m_InputState == Input.InputState.Up)
-				{
-					m_Ctrlr.Buttons &= ~X360Buttons.RightBumper;
-				}
-				else if (i.m_InputState == Input.InputState.Impulse)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.RightBumper;
-					ImpulseRelease(X360Buttons.RightBumper);
-				}
-			}
-			if (i == b.LeftTrigger)
-			{
-				if (i.m_InputState == Input.InputState.Down)
-				{
-					m_Ctrlr.LeftTrigger = 255;
-				}
-				else if (i.m_InputState == Input.InputState.Up)
-				{
-					m_Ctrlr.LeftTrigger = 0;
-				}
-				else if (i.m_InputState == Input.InputState.Impulse)
-				{
-					m_Ctrlr.LeftTrigger = 255;
-					Task.Run(() =>
+					if (i.m_InputState[idx] == Input.InputState.Down)
 					{
-						Thread.Sleep(10);
+						m_Ctrlr.Buttons |= X360Buttons.A;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Up)
+					{
+						m_Ctrlr.Buttons &= ~X360Buttons.A;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Impulse)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.A;
+						ImpulseRelease(X360Buttons.A);
+					}
+				}
+
+				if (!m_DisabledButtons.Contains("X") && i.m_InputType == b.XButton.m_InputType && i.Code[idx] == b.XButton.Code)
+				{
+					if (i.m_InputState[idx] == Input.InputState.Down)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.X;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Up)
+					{
+						m_Ctrlr.Buttons &= ~X360Buttons.X;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Impulse)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.X;
+						ImpulseRelease(X360Buttons.X);
+					}
+				}
+
+				if (!m_DisabledButtons.Contains("Y") && i.m_InputType == b.YButton.m_InputType && i.Code[idx] == b.YButton.Code)
+				{
+					if (i.m_InputState[idx] == Input.InputState.Down)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.Y;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Up)
+					{
+						m_Ctrlr.Buttons &= ~X360Buttons.Y;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Impulse)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.Y;
+						ImpulseRelease(X360Buttons.Y);
+					}
+				}
+
+				if (!m_DisabledButtons.Contains("B") && i.m_InputType == b.BButton.m_InputType && i.Code[idx] == b.BButton.Code)
+				{
+					if (i.m_InputState[idx] == Input.InputState.Down)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.B;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Up)
+					{
+						m_Ctrlr.Buttons &= ~X360Buttons.B;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Impulse)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.B;
+						ImpulseRelease(X360Buttons.B);
+					}
+				}
+
+				if (!m_DisabledButtons.Contains("START") && i.m_InputType == b.StartButton.m_InputType && i.Code[idx] == b.StartButton.Code)
+				{
+					if (i.m_InputState[idx] == Input.InputState.Down)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.Start;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Up)
+					{
+						m_Ctrlr.Buttons &= ~X360Buttons.Start;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Impulse)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.Start;
+						ImpulseRelease(X360Buttons.Start);
+					}
+				}
+
+				if (!m_DisabledButtons.Contains("BACK") && i.m_InputType == b.BackButton.m_InputType && i.Code[idx] == b.BackButton.Code)
+				{
+					if (i.m_InputState[idx] == Input.InputState.Down)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.Back;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Up)
+					{
+						m_Ctrlr.Buttons &= ~X360Buttons.Back;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Impulse)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.Back;
+						ImpulseRelease(X360Buttons.Back);
+					}
+				}
+
+				if (!m_DisabledButtons.Contains("UP") && i.m_InputType == b.DPadUp.m_InputType && i.Code[idx] == b.DPadUp.Code)
+				{
+					if (i.m_InputState[idx] == Input.InputState.Down)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.Up;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Up)
+					{
+						m_Ctrlr.Buttons &= ~X360Buttons.Up;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Impulse)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.Up;
+						ImpulseRelease(X360Buttons.Up);
+					}
+				}
+
+				if (!m_DisabledButtons.Contains("DOWN") && i.m_InputType == b.DPadDown.m_InputType && i.Code[idx] == b.DPadDown.Code)
+				{
+					if (i.m_InputState[idx] == Input.InputState.Down)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.Down;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Up)
+					{
+						m_Ctrlr.Buttons &= ~X360Buttons.Down;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Impulse)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.Down;
+						ImpulseRelease(X360Buttons.Down);
+					}
+				}
+
+				if (!m_DisabledButtons.Contains("RIGHT") && i.m_InputType == b.DPadRight.m_InputType && i.Code[idx] == b.DPadRight.Code)
+				{
+					if (i.m_InputState[idx] == Input.InputState.Down)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.Right;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Up)
+					{
+						m_Ctrlr.Buttons &= ~X360Buttons.Right;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Impulse)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.Right;
+						ImpulseRelease(X360Buttons.Right);
+					}
+				}
+
+				if (!m_DisabledButtons.Contains("LEFT") && i.m_InputType == b.DPadLeft.m_InputType && i.Code[idx] == b.DPadLeft.Code)
+				{
+					if (i.m_InputState[idx] == Input.InputState.Down)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.Left;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Up)
+					{
+						m_Ctrlr.Buttons &= ~X360Buttons.Left;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Impulse)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.Left;
+						ImpulseRelease(X360Buttons.Left);
+					}
+				}
+
+				if (!m_DisabledButtons.Contains("LB") && i.m_InputType == b.LeftBumper.m_InputType && i.Code[idx] == b.LeftBumper.Code)
+				{
+					if (i.m_InputState[idx] == Input.InputState.Down)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.LeftBumper;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Up)
+					{
+						m_Ctrlr.Buttons &= ~X360Buttons.LeftBumper;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Impulse)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.LeftBumper;
+						ImpulseRelease(X360Buttons.LeftBumper);
+					}
+				}
+
+				if (!m_DisabledButtons.Contains("RB") && i.m_InputType == b.RightBumper.m_InputType && i.Code[idx] == b.RightBumper.Code)
+				{
+					if (i.m_InputState[idx] == Input.InputState.Down)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.RightBumper;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Up)
+					{
+						m_Ctrlr.Buttons &= ~X360Buttons.RightBumper;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Impulse)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.RightBumper;
+						ImpulseRelease(X360Buttons.RightBumper);
+					}
+				}
+
+				if (!m_DisabledButtons.Contains("LT") && i.m_InputType == b.LeftTrigger.m_InputType && i.Code[idx] == b.LeftTrigger.Code)
+				{
+					if (i.m_InputState[idx] == Input.InputState.Down)
+					{
+						m_Ctrlr.LeftTrigger = 255;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Up)
+					{
 						m_Ctrlr.LeftTrigger = 0;
-						m_Bus.Report(2, m_Ctrlr.GetReport());
-					});
-				}
-			}
-			if (i == b.RightTrigger)
-			{
-				if (i.m_InputState == Input.InputState.Down)
-				{
-					m_Ctrlr.RightTrigger = 255;
-				}
-				else if (i.m_InputState == Input.InputState.Up)
-				{
-					m_Ctrlr.RightTrigger = 0;
-				}
-				else if (i.m_InputState == Input.InputState.Impulse)
-				{
-					m_Ctrlr.RightTrigger = 255;
-					Task.Run(() =>
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Impulse)
 					{
-						Thread.Sleep(10);
+						m_Ctrlr.LeftTrigger = 255;
+						Task.Run(() =>
+						{
+							Thread.Sleep(10);
+							m_Ctrlr.LeftTrigger = 0;
+							m_Bus.Report(2, m_Ctrlr.GetReport());
+						});
+					}
+				}
+
+				if (!m_DisabledButtons.Contains("RT") && i.m_InputType == b.RightTrigger.m_InputType && i.Code[idx] == b.RightTrigger.Code)
+				{
+					if (i.m_InputState[idx] == Input.InputState.Down)
+					{
+						m_Ctrlr.RightTrigger = 255;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Up)
+					{
 						m_Ctrlr.RightTrigger = 0;
-						m_Bus.Report(2, m_Ctrlr.GetReport());
-					});
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Impulse)
+					{
+						m_Ctrlr.RightTrigger = 255;
+						Task.Run(() =>
+						{
+							Thread.Sleep(10);
+							m_Ctrlr.RightTrigger = 0;
+							m_Bus.Report(2, m_Ctrlr.GetReport());
+						});
+					}
+				}
+
+				if (!m_DisabledButtons.Contains("LJOY") && i.m_InputType == b.LeftJoyPress.m_InputType && i.Code[idx] == b.LeftJoyPress.Code)
+				{
+					if (i.m_InputState[idx] == Input.InputState.Down)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.LeftStick;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Up)
+					{
+						m_Ctrlr.Buttons &= ~X360Buttons.LeftStick;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Impulse)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.LeftStick;
+						ImpulseRelease(X360Buttons.LeftStick);
+					}
+				}
+
+				if (!m_DisabledButtons.Contains("RJOY") && i.m_InputType == b.RightJoyPress.m_InputType && i.Code[idx] == b.RightJoyPress.Code)
+				{
+					if (i.m_InputState[idx] == Input.InputState.Down)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.RightStick;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Up)
+					{
+						m_Ctrlr.Buttons &= ~X360Buttons.RightStick;
+					}
+					else if (i.m_InputState[idx] == Input.InputState.Impulse)
+					{
+						m_Ctrlr.Buttons |= X360Buttons.RightStick;
+						ImpulseRelease(X360Buttons.RightStick);
+					}
+				}
+
+				if (b.RightJoyType == Input.InputType.Keyboard)
+				{
+					if ((i.m_InputType == b.RightJoyUp.m_InputType && i.Code[idx] == b.RightJoyUp.Code) ||
+						(i.m_InputType == b.RightJoyDown.m_InputType && i.Code[idx] == b.RightJoyDown.Code))
+					{
+						short y = 0;
+						if (Input.GetKeyState(b.RightJoyUp))
+							y += short.MaxValue;
+
+						if (Input.GetKeyState(b.RightJoyDown))
+							y -= short.MinValue;
+
+						m_Ctrlr.RightStickY = y;
+					}
+
+					if ((i.m_InputType == b.RightJoyRight.m_InputType && i.Code[idx] == b.RightJoyRight.Code) ||
+						(i.m_InputType == b.RightJoyLeft.m_InputType && i.Code[idx] == b.RightJoyLeft.Code))
+					{
+						short x = 0;
+						if (Input.GetKeyState(b.RightJoyLeft))
+							x -= short.MinValue;
+
+						if (Input.GetKeyState(b.RightJoyRight))
+							x += short.MaxValue;
+
+						m_Ctrlr.RightStickX = x;
+					}
+				}
+
+				if (b.LeftJoyType == Input.InputType.Keyboard)
+				{
+					if ((i.m_InputType == b.LeftJoyUp.m_InputType && i.Code[idx] == b.LeftJoyUp.Code) ||
+						(i.m_InputType == b.LeftJoyDown.m_InputType && i.Code[idx] == b.LeftJoyDown.Code))
+					{
+						short y = 0;
+						if (Input.GetKeyState(b.LeftJoyUp))
+							y += short.MaxValue;
+
+						if (Input.GetKeyState(b.LeftJoyDown))
+							y -= short.MinValue;
+
+						m_Ctrlr.LeftStickY = y;
+					}
+
+					if ((i.m_InputType == b.LeftJoyRight.m_InputType && i.Code[idx] == b.LeftJoyRight.Code) ||
+						(i.m_InputType == b.LeftJoyLeft.m_InputType && i.Code[idx] == b.LeftJoyLeft.Code))
+					{
+						short x = 0;
+						if (Input.GetKeyState(b.LeftJoyLeft))
+							x -= short.MinValue;
+
+						if (Input.GetKeyState(b.LeftJoyRight))
+							x += short.MaxValue;
+
+						m_Ctrlr.LeftStickX = x;
+					}
 				}
 			}
-			if (i == b.LeftJoyPress)
-			{
-				if (i.m_InputState == Input.InputState.Down)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.LeftStick;
-				}
-				else if (i.m_InputState == Input.InputState.Up)
-				{
-					m_Ctrlr.Buttons &= ~X360Buttons.LeftStick;
-				}
-				else if (i.m_InputState == Input.InputState.Impulse)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.LeftStick;
-					ImpulseRelease(X360Buttons.LeftStick);
-				}
-			}
-			if (i == b.RightJoyPress)
-			{
-				if (i.m_InputState == Input.InputState.Down)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.RightStick;
-				}
-				else if (i.m_InputState == Input.InputState.Up)
-				{
-					m_Ctrlr.Buttons &= ~X360Buttons.RightStick;
-				}
-				else if (i.m_InputState == Input.InputState.Impulse)
-				{
-					m_Ctrlr.Buttons |= X360Buttons.RightStick;
-					ImpulseRelease(X360Buttons.RightStick);
-				}
-			}
-			if (b.RightJoyType == Input.InputType.Keyboard)
-			{
-				if(i == b.RightJoyUp || i == b.RightJoyDown)
-				{
-					short y = 0;
-					if (Input.GetKeyState(b.RightJoyUp))
-						y += short.MaxValue;
 
-					if (Input.GetKeyState(b.RightJoyDown))
-						y -= short.MinValue;
-
-					m_Ctrlr.RightStickY = y;
-				}
-
-				if (i == b.RightJoyRight || i == b.RightJoyLeft)
-				{
-					short x = 0;
-					if (Input.GetKeyState(b.RightJoyLeft))
-						x -= short.MinValue;
-
-					if (Input.GetKeyState(b.RightJoyRight))
-						x += short.MaxValue;
-
-					m_Ctrlr.RightStickX = x;
-				}
-			}
-			else if(i.m_InputType == Input.InputType.Mouse)
+			if (b.RightJoyType == Input.InputType.Mouse && i.m_InputType == Input.InputType.Mouse)
 			{
 				UpdatePast(i);
 				bPastUpdated = true;
 				CalcJoy(value => m_Ctrlr.RightStickX = value, value => m_Ctrlr.RightStickY = value);
 			}
 
-			if (b.LeftJoyType == Input.InputType.Keyboard)
-			{
-				if (i == b.LeftJoyUp || i == b.LeftJoyDown)
-				{
-					short y = 0;
-					if (Input.GetKeyState(b.LeftJoyUp))
-						y += short.MaxValue;
-
-					if (Input.GetKeyState(b.LeftJoyDown))
-						y -= short.MinValue;
-
-					m_Ctrlr.LeftStickY = y;
-				}
-
-				if (i == b.LeftJoyRight || i == b.LeftJoyLeft)
-				{
-					short x = 0;
-					if (Input.GetKeyState(b.LeftJoyLeft))
-						x -= short.MinValue;
-
-					if (Input.GetKeyState(b.LeftJoyRight))
-						x += short.MaxValue;
-
-					m_Ctrlr.LeftStickX = x;
-				}
-			}
-			else if (i.m_InputType == Input.InputType.Mouse)
+			if (b.LeftJoyType == Input.InputType.Mouse && i.m_InputType == Input.InputType.Mouse)
 			{
 				if (!bPastUpdated)
 					UpdatePast(i);

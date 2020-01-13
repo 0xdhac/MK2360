@@ -75,6 +75,33 @@ namespace MK2360
 			return true;
 		}
 
+		public string GetSetting(string script, string key)
+		{
+			if (!m_ScriptSettings.ContainsKey(script))
+				return null;
+
+			Dictionary<string, string> scriptDict;
+			if (!m_ScriptSettings.TryGetValue(script, out scriptDict))
+				return null;
+
+			string value;
+			scriptDict.TryGetValue(key, out value);
+
+			return value;
+		}
+
+		public void ChangeSetting(string script, string key, string value)
+		{
+			try
+			{
+				m_ScriptSettings[script][key] = value;
+			}
+			catch(Exception e)
+			{
+				Form1.Log(e.Message);
+			}
+		}
+
 		public static void CheckDirectory()
 		{
 			if (!Directory.Exists(m_Path))

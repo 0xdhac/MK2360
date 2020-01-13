@@ -6,6 +6,7 @@ using Nett;
 using System.Collections.Generic;
 using NLua;
 using ScpDriverInterface;
+using System.Linq;
 
 namespace MK2360
 {
@@ -21,7 +22,8 @@ namespace MK2360
 		//private List<Key> m_Keys = new List<Key>();
 		private List<KeyFunction> m_Keys = new List<KeyFunction>();
 		public Dictionary<object, object> ScriptInfo = new Dictionary<object, object>();
-		private Dictionary<string, string> Settings = new Dictionary<string, string>();
+		public Dictionary<string, string> Settings = new Dictionary<string, string>();
+		private bool Enabled = true;
 		public Script(string script)
 		{
 			ScriptName = script;
@@ -34,13 +36,20 @@ namespace MK2360
 				m_Lua.RegisterFunction("SetButton", typeof(Script).GetMethod("SetButton"));
 				m_Lua.RegisterFunction("RegisterKeyDown", this, typeof(Script).GetMethod("RegisterKeyDown"));
 				m_Lua.RegisterFunction("RegisterKeyUp", this, typeof(Script).GetMethod("RegisterKeyUp"));
+				m_Lua.RegisterFunction("UnregisterKeyDown", this, typeof(Script).GetMethod("UnregisterKeyDown"));
+				m_Lua.RegisterFunction("UnregisterKeyUp", this, typeof(Script).GetMethod("UnregisterKeyUp"));
 				m_Lua.RegisterFunction("CreateSetting", this, typeof(Script).GetMethod("CreateSetting"));
+				m_Lua.RegisterFunction("GetSetting", this, typeof(Script).GetMethod("GetSetting"));
+				m_Lua.RegisterFunction("DisableOriginalBind", typeof(XMode).GetMethod("DisableOriginalBind"));
+				m_Lua.RegisterFunction("EnableOriginalBind", typeof(XMode).GetMethod("EnableOriginalBind"));
+                m_Lua.RegisterFunction("StartXMode", typeof(XMode).GetMethod("Start"));
+                m_Lua.RegisterFunction("StopXMode", typeof(Script).GetMethod("StopXMode"));
+                m_Lua.RegisterFunction("IsXModeActive", typeof(XMode).GetMethod("IsActive"));
 			}
 			catch(Exception e)
 			{
 				Log(e.Message);
 			}
-
 
 			try
 			{
@@ -69,15 +78,94 @@ namespace MK2360
 			ScriptList.Add(this);
 		}
 
+        public static void StopXMode()
+        {
+            XMode.Stop(true);
+        }
+
+		public static void LoadAll()
+		{
+			string[] scripts = Directory.GetFiles(ScriptFolder + "/", "*." + ScriptExtension, SearchOption.TopDirectoryOnly);
+			foreach(string s in scripts)
+			{
+				string scriptName = Path.GetFileNameWithoutExtension(s);
+				new Script(scriptName);
+			}
+		}
+
+		public static void ReloadAll()
+		{
+			for(int i = 0; i < ScriptList.Count; )
+			{
+				ScriptList[i].CallUnloadFunc();
+				ScriptList.Remove(ScriptList[i]);
+			}
+
+			LoadAll();
+		}
+
+		public static void Reload(Script script)
+		{
+			ScriptList.Remove(script);
+			new Script(script.ScriptName);
+		}
+
+		public void CallUnloadFunc()
+		{
+			var func = m_Lua["OnScriptUnloaded"] as LuaFunction;
+
+			if (func != null)
+			{
+				func.Call();
+			}
+		}
+
 		public void CreateSetting(string keyName, string defaultVal, string formType)
 		{
 			Preset.Current.AddSetting(ScriptName, keyName, defaultVal);
 			Settings.Add(keyName, formType);
 		}
 
-		public void GetSetting(string key)
+		public string GetSetting(string key)
 		{
+			return Preset.Current.GetSetting(ScriptName, key);
+		}
 
+		public void ChangeSetting(string key, string value)
+		{
+			Preset.Current.ChangeSetting(ScriptName, key, value);
+			Preset.Current.Save();
+
+			var func = m_Lua["OnSettingChanged"] as LuaFunction;
+
+			if (func != null)
+			{
+				func.Call(key, value);
+			}
+		}
+
+		public void Enable()
+		{
+			Enabled = true;
+
+			var enableFunc = m_Lua["OnScriptEnabled"] as LuaFunction;
+
+			if(enableFunc != null)
+			{
+				enableFunc.Call();
+			}
+		}
+
+		public void Disable()
+		{
+			Enabled = false;
+
+			var disFunc = m_Lua["OnScriptDisabled"] as LuaFunction;
+
+			if (disFunc != null)
+			{
+				disFunc.Call();
+			}
 		}
 
 		public void RegisterKeyDown(string key, string funcname)
@@ -86,22 +174,11 @@ namespace MK2360
 			if (func == null)
 			{
 				Log("Invalid function name: " + funcname);
+				return;
 			}
 
-			Input.DIK kCode;
-			Input.MouseInput mCode;
-			if (Enum.TryParse(key, out kCode))
-			{
-				m_Keys.Add(new KeyFunction(new Key(Input.InputType.Keyboard, kCode), func, Input.InputState.Down));
-			}
-			else if (Enum.TryParse(key, out mCode))
-			{
-				m_Keys.Add(new KeyFunction(new Key(Input.InputType.Mouse, mCode), func, Input.InputState.Down));
-			}
-			else
-			{
-				Log("Invalid key code: " + key);
-			}
+			Key k = new Key(key);
+			m_Keys.Add(new KeyFunction(k, funcname, Input.InputState.Down));
 		}
 
 		public void RegisterKeyUp(string key, string funcname)
@@ -110,22 +187,39 @@ namespace MK2360
 			if (func == null)
 			{
 				Log("Invalid function name: " + funcname);
+				return;
 			}
 
-			Input.DIK kCode;
-			Input.MouseInput mCode;
-			if (Enum.TryParse(key, out kCode))
+			Key k = new Key(key);
+			m_Keys.Add(new KeyFunction(k, funcname, Input.InputState.Up));
+		}
+
+		public void UnregisterKeyDown(string key, string funcname)
+		{
+			List<KeyFunction> remove = new List<KeyFunction>();
+			foreach(KeyFunction kf in m_Keys)
 			{
-				m_Keys.Add(new KeyFunction(new Key(Input.InputType.Keyboard, kCode), func, Input.InputState.Up));
+				if(kf.m_Key.ToString() == key && kf.m_Func == funcname && kf.m_State == Input.InputState.Down)
+				{
+					remove.Add(kf);
+				}
 			}
-			else if (Enum.TryParse(key, out mCode))
+
+			m_Keys = m_Keys.Except(remove).ToList();
+		}
+
+		public void UnregisterKeyUp(string key, string funcname)
+		{
+			List<KeyFunction> remove = new List<KeyFunction>();
+			foreach (KeyFunction kf in m_Keys)
 			{
-				m_Keys.Add(new KeyFunction(new Key(Input.InputType.Mouse, mCode), func, Input.InputState.Up));
+				if (kf.m_Key.ToString() == key && kf.m_Func == funcname && kf.m_State == Input.InputState.Up)
+				{
+					remove.Add(kf);
+				}
 			}
-			else
-			{
-				Log("Invalid key code: " + key);
-			}
+
+			m_Keys = m_Keys.Except(remove).ToList();
 		}
 
 		public void Wait(int ms)
@@ -150,7 +244,7 @@ namespace MK2360
 			try
 			{
 				int idx = (int)Enum.Parse(typeof(Input.MouseInput), key);
-				return Input.Mouse_KeyState[idx];
+				return (Input.Mouse_KeyState & idx) > 0;
 			}
 			catch(Exception e)
 			{
@@ -304,23 +398,34 @@ namespace MK2360
 
 		private Input.InputAction KeyPressed(Input i)
 		{
-			if (!XMode.IsActive())
-				return Input.InputAction.Continue;
+            if(!XMode.IsActive())
+            {
+                return Input.InputAction.Continue;
+            }
 
-			foreach(KeyFunction kf in m_Keys)
+			if (!i.IsChanged.Contains(true))
+				return Input.InputAction.Block;
+
+			foreach (KeyFunction kf in m_Keys)
 			{
-				if(kf.m_Key == i && i.m_InputState == kf.m_State)
+				foreach(Input.InputState inp in i.m_InputState)
 				{
-					if(kf.m_Func != null)
+					if (kf.m_Key == i && inp == kf.m_State)
 					{
-						Task.Run(() =>
+						if (kf.m_Func != null)
 						{
-							kf.m_Func.Call(i.Code.ToString());
-						});
-					}
+							Task.Run(() =>
+							{
+								var func = m_Lua[kf.m_Func] as LuaFunction;
+								if(func != null)
+									func.Call(i.Code.ToString());
+							});
+						}
 
-					return Input.InputAction.Block;
+						return Input.InputAction.Block;
+					}
 				}
+
 			}
 
 			return Input.InputAction.Continue;
@@ -337,29 +442,13 @@ namespace MK2360
 		}
 	}
 
-	public class LuaSetting
-	{
-		public string Key { get; set; }
-		public string Value { get; set; }
-		public string FormType;
-		
-		public LuaSetting(string key, string value, string formType)
-		{
-			Key = key;
-			FormType = formType;
-			Value = value;
-		}
-
-		//void UpdatePreset()
-	}
-
 	public class KeyFunction
 	{
 		public Key m_Key;
-		public LuaFunction m_Func;
+		public string m_Func;
 		public Input.InputState m_State;
 
-		public KeyFunction(Key k, LuaFunction f, Input.InputState s)
+		public KeyFunction(Key k, string f, Input.InputState s)
 		{
 			m_Key = k;
 			m_Func = f;

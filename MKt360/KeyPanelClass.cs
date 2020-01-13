@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 namespace MK2360
 {
@@ -219,7 +220,11 @@ namespace MK2360
 
 	public class BindControl : TextBox
 	{
-		private Key m_Key = new Key(Input.InputType.Keyboard, Input.DIK.Invalid);
+		public delegate void BindControlChangedCallback(Dictionary<string, string> info, Key newKey);
+
+		public BindControlChangedCallback Callback = null;
+		public Dictionary<string, string> Info = new Dictionary<string, string>();
+		private Key m_Key = new Key(Input.InputType.Keyboard, (ushort)Input.DIK.Invalid);
 		public Key Key
 		{
 			set
@@ -239,16 +244,6 @@ namespace MK2360
 			Click += new EventHandler(BindControl_Click);
 			Text = m_Key.ToString();
 		}
-
-		/*
-		public BindControl(Key key)
-		{
-			Cursor = Cursors.Hand;
-			ReadOnly = true;
-			Click += new EventHandler(BindControl_Click);
-			m_Key = key;
-		}
-		*/
 
 		public override string Text
 		{
@@ -274,32 +269,33 @@ namespace MK2360
 			Text = "Press any key..";
 			Input.AddKeyListener(OnKeyPress);
 		}
+
 		private Input.InputAction OnKeyPress(Input key)
 		{
-			if(key.m_InputState == Input.InputState.Up)
+			foreach(Input.InputState i in key.m_InputState)
 			{
-				return Input.InputAction.Continue;
+				if (i == Input.InputState.Up)
+					continue;
 			}
 
 			if(key.m_InputType == Input.InputType.Mouse)
 			{
 				Interception.MouseStroke s = key.Stroke;
 				if (s.state == 0)
-				{
 					return Input.InputAction.Continue;
-				}
 			}
 
-			if(key.m_InputType == Input.InputType.Keyboard && key.Code.ToString() == Config.m_Config.m_KillSwitch.ToString())
+			if(key.m_InputType == Input.InputType.Keyboard && (Input.DIK)key.Code[0] == Config.m_Config.m_KillSwitch)
 			{
 				Form1.Log("Please avoid binding keys to the same key as your kill switch key.");
 				return Input.InputAction.Continue;
 			}
 
-			m_Key.m_InputType        = key.m_InputType;
-			m_Key.Code               = key.Code;
-			Text                     = key.ToString();
-			Click                   += new EventHandler(BindControl_Click);
+			m_Key.m_InputType = key.m_InputType;
+			m_Key.Code = key.Code[0];
+			Text = m_Key.ToString();
+
+			Callback?.Invoke(Info, Key);
 
 			return Input.InputAction.Stop;
 		}

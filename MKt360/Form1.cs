@@ -127,8 +127,7 @@ namespace MK2360
 
 		private void Scripts()
 		{
-			new Script("holdtoedit");
-			new Script("wallreplace");
+			Script.LoadAll();
 		}
 
 		private void ValidateSelfThread()
@@ -438,35 +437,39 @@ namespace MK2360
 				if (Interception.interception_is_keyboard(device) != 0)
 				{
 					Interception.KeyStroke kstroke = stroke;
-					Input i = new Input(kstroke);
-					if(i.IsChanged)
-					{
-						Input.InputAction act = i.CallKeyListeners();
 
-						if ((act & Input.InputAction.Block) == 0)
-							Interception.interception_send(context, device, strokeBytes, 1);
-					}
-					else
+					if(kstroke.code == (ushort)Input.DIK.LWin || kstroke.code == (ushort)Input.DIK.RWin)
 					{
 						Interception.interception_send(context, device, strokeBytes, 1);
+						continue;
 					}
+
+					Input i = new Input(kstroke);
+
+					if (i.m_InputType == Input.InputType.Keyboard && Config.m_Config.m_KillSwitch == (Input.DIK)i.Code[0] && i.m_InputState[0] == Input.InputState.Down)
+					{
+						if (XMode.IsActive())
+							XMode.Stop(false);
+						else
+							XMode.Start();
+
+						continue;
+					}
+
+					Input.InputAction act = i.CallKeyListeners();
+
+					if ((act & Input.InputAction.Block) == 0)
+						Interception.interception_send(context, device, strokeBytes, 1);
 				}
 				else if (Interception.interception_is_mouse(device) != 0)
 				{
 					Interception.MouseStroke kstroke = stroke;
 					Input i = new Input(kstroke);
 
-					if (i.IsChanged)
-					{
-						Input.InputAction act = i.CallKeyListeners();
+					Input.InputAction act = i.CallKeyListeners();
 
-						if ((act & Input.InputAction.Block) == 0)
-							Interception.interception_send(context, device, strokeBytes, 1);
-					}
-					else
-					{
+					if ((act & Input.InputAction.Block) == 0)
 						Interception.interception_send(context, device, strokeBytes, 1);
-					}
 				}
 			}
 
