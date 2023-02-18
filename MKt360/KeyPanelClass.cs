@@ -22,6 +22,50 @@ namespace MK2360
 		}
 	}
 
+	public class X360ControlSelection : ComboBox
+	{
+		public delegate void X360ControlSelectionChangedCallback(Dictionary<string, string> info, X360Key key);
+
+		public X360ControlSelectionChangedCallback Callback = null;
+		public Dictionary<string, string> Info = new Dictionary<string, string>();
+
+		public X360ControlSelection()
+		{
+			Width = 88;
+			Height = 23;
+			DropDownStyle = ComboBoxStyle.DropDownList;
+
+			foreach(var key in Enum.GetValues(typeof(X360Key)))
+			{
+				Items.Add(key);
+			}
+
+			SelectedValueChanged += X360ControlSelection_SelectedValueChanged;
+		}
+
+		private void X360ControlSelection_SelectedValueChanged(object sender, EventArgs e)
+		{
+			Callback?.Invoke(Info, (X360Key)SelectedItem);
+		}
+	}
+
+	public class X360ControlItem : Panel
+	{
+		public X360ControlSelection m_Bind = new X360ControlSelection();
+		public Label m_Label = new Label();
+
+		public X360ControlItem()
+		{
+			Controls.Add(m_Label);
+			m_Label.Location = new System.Drawing.Point(0, 3);
+			m_Label.Size = new System.Drawing.Size(70, 20);
+
+			Controls.Add(m_Bind);
+			m_Bind.Location = new System.Drawing.Point(70, 0);
+			m_Bind.Size = new System.Drawing.Size(108, 20);
+		}
+	}
+
 	public class JoyControl : Panel
 	{
 		public bool IsLeft = true;
@@ -237,6 +281,7 @@ namespace MK2360
 				return m_Key;
 			}
 		}
+
 		public BindControl()
 		{
 			Cursor = Cursors.Hand;

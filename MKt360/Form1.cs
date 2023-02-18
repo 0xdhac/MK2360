@@ -117,6 +117,7 @@ namespace MK2360
 			RBButton.Click += RBButton_Click;
 
 			ControllerModeButton.FlatStyle = FlatStyle.Flat;
+			
 
 #if !NOVERIFY
 			Thread v = new Thread(ValidateSelfThread);
@@ -526,13 +527,13 @@ namespace MK2360
 					continue;
 
 				// Don't show processes that arent winform applications
-				if (p.MainWindowTitle.Length > 0)
-				{
-					ProcessItem pi = new ProcessItem();
-					pi.m_Display = p.MainWindowTitle.Trim();
-					pi.m_Process = p.ProcessName;
-					ProcessComboBox.Items.Add(pi);
-				}
+				if (p.MainWindowTitle.Length == 0)
+					continue;
+
+				ProcessItem pi = new ProcessItem();
+				pi.m_Display = p.MainWindowTitle.Trim();
+				pi.m_Process = p.ProcessName;
+				ProcessComboBox.Items.Add(pi);
 			}
 		}
 		private void SavePresetButton_Click(object sender, EventArgs e)

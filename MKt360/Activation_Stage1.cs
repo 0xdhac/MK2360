@@ -97,41 +97,5 @@ namespace MK2360
 				new ErrorBox("Honestly don't know what happened. Sorry.").ShowDialog();
 			}
 		}
-
-		private async void AttemptSendEmail2(string email)
-		{
-			HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://oxdmacro.site.nfoservers.com/activation.php?email=" + email);
-			request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-
-			using (HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync())
-			using (Stream stream = response.GetResponseStream())
-			using (StreamReader reader = new StreamReader(stream))
-			{
-				string result = await reader.ReadToEndAsync();
-
-				if (result.Equals("INVALID_EMAIL"))
-				{
-					new ErrorBox("Input is not a valid e-mail.").ShowDialog();
-				}
-				else if (result.Equals("EMAIL_EXISTS"))
-				{
-					new ErrorBox("Specified e-mail already exists").ShowDialog();
-				}
-				else if (result.Equals("EMAIL_NOT_SENT"))
-				{
-					new ErrorBox("The e-mail failed to send. Sorry <3. My contact info is on the login form.").ShowDialog();
-				}
-				else if (result.Equals("EMAIL_SENT"))
-				{
-					Dispose();
-					new Activation_Stage2(email, m_paymentType).ShowDialog();
-				}
-				else
-				{
-					DescriptionLabel.Text = result;
-					new ErrorBox("Honestly don't know what happened. Sorry.").ShowDialog();
-				}
-			}
-		}
 	}
 }

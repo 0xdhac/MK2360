@@ -43,7 +43,7 @@ namespace MK2360
 
 			ReloadSplitButton.ContextMenuStrip = menu;
 
-			EditButton.Hide();
+			//EditButton.Hide();
 		}
 
 		private void ReloadItem_Clicked(object sender, ToolStripItemClickedEventArgs e)
@@ -129,7 +129,7 @@ namespace MK2360
 					{
 						ButtonControl b = new ButtonControl();
 						SettingsPanel.Controls.Add(b);
-						b.Location = new Point(10, 10);
+						b.Location = new Point(10, 10 + (SettingsPanel.Controls.Count - 1) * 25);
 						b.Size = new Size(178, 174);
 						b.m_Label.Text = k.Key + ":";
 						b.m_Bind.Key = new Key(value);
@@ -139,6 +139,34 @@ namespace MK2360
 						b.m_Bind.Info.Add("setting", k.Key);
 						b.m_Bind.Callback = OnKeySettingChanged;
 					}
+					else if(formType == "X360Control")
+					{
+						X360ControlItem x = new X360ControlItem();
+						SettingsPanel.Controls.Add(x);
+						x.m_Label.Text = k.Key + ":";
+						x.m_Bind.Location = new Point(118, 0);
+						x.Location = new Point(10, 10 + (SettingsPanel.Controls.Count - 1) * 25);
+						x.Size = new Size(SettingsPanel.Width, 23);
+						x.m_Bind.SelectedIndex = x.m_Bind.FindString(value.ToString());
+						x.m_Bind.Info.Add("script", s.ScriptName);
+						x.m_Bind.Info.Add("setting", k.Key);
+						x.m_Bind.Callback = OnX360KeySettingChanged;
+
+						Form1.Log(value);
+						//x.m_Bind.SelectedIndexChanged += OnKeySettingChanged;
+						//SettingsPanel.Controls.Add(x);
+					}
+				}
+			}
+		}
+
+		private void OnX360KeySettingChanged(Dictionary<string, string> info, X360Key key)
+		{
+			foreach (Script s in Script.ScriptList)
+			{
+				if (s.ScriptName == info["script"])
+				{
+					s.ChangeSetting(info["setting"], key.ToString());
 				}
 			}
 		}
@@ -157,13 +185,13 @@ namespace MK2360
 		private void EditButton_Click(object sender, EventArgs e)
 		{
 			Script s = (Script)ScriptBox.SelectedItem;
-			if(s != null)
-			{
-				string path = Script.ScriptFolder + "/" + s.ScriptName + Script.ScriptExtension;
 
-				if(File.Exists(path))
+			if (s != null)
+			{
+				string path = Path.GetFullPath(Script.ScriptFolder + "/" + s.ScriptName + "." + Script.ScriptExtension);
+				if (File.Exists(path))
 				{
-					
+					System.Diagnostics.Process.Start(path);
 				}
 			}
 		}

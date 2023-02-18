@@ -332,6 +332,26 @@ namespace MK2360
 		}
 	}
 
+	public enum X360Key
+	{
+		StartKey,
+		BackButton,
+		YButton,
+		XButton,
+		AButton,
+		BButton,
+		RightJoyPress,
+		LeftJoyPress,
+		DPadUp,
+		DPadDown,
+		DPadRight,
+		DPadLeft,
+		LeftTrigger,
+		LeftBumper,
+		RightTrigger,
+		RightBumper
+	}
+
 	public class Key
 	{
 		public Input.InputType m_InputType { get; set; }
